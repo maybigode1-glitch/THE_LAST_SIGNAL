@@ -30,7 +30,7 @@
 4. Create a child Blueprint of `ASignalInteractable` for a signal objective; assign a visible Static Mesh that blocks Visibility.
 5. Create a child Blueprint of `ASignalBatteryPickup`; assign a battery-shaped mesh that blocks Visibility. Place several in the level.
 6. Optionally create a child GameMode Blueprint and set the required signal count.
-7. Set the map's GameMode override to `ALastSignalGameMode` or its Blueprint child, then test E/F/R. The HUD is registered automatically by this GameMode.
+7. Add a `NavMeshBoundsVolume` covering walkable floor space and build navigation (press P in the editor to inspect the green navigable area).\n8. Place one or more `ASignalStalker` actors inside the navigable area. Create a child Blueprint to assign a skeletal mesh, animation Blueprint, and optional sounds; the native class supplies AI behaviour but intentionally does not bundle copyrighted character assets.\n9. Set the map's GameMode override to `ALastSignalGameMode` or its Blueprint child, then test E/F/R and enemy behaviour. The HUD is registered automatically by this GameMode.
 
 ## Acceptance checklist
 - [ ] Project opens and C++ module compiles in UE 5.4.
