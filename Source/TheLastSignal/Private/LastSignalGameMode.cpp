@@ -1,6 +1,15 @@
 #include "LastSignalGameMode.h"
 #include "LastSignalCharacter.h"
-ALastSignalGameMode::ALastSignalGameMode()
+#include "Engine/Engine.h"
+ALastSignalGameMode::ALastSignalGameMode() { DefaultPawnClass = ALastSignalCharacter::StaticClass(); }
+void ALastSignalGameMode::RegisterSignalCollected()
 {
-    DefaultPawnClass = ALastSignalCharacter::StaticClass();
+    if (AreObjectivesComplete()) return;
+    ++SignalsCollected;
+    if (GEngine)
+    {
+        const bool bComplete = AreObjectivesComplete();
+        const FString Message = bComplete ? TEXT("Objective complete: all signals recovered") : FString::Printf(TEXT("Signal recovered: %d/%d"), SignalsCollected, RequiredSignals);
+        GEngine->AddOnScreenDebugMessage(-1, 3.0f, bComplete ? FColor::Green : FColor::Cyan, Message);
+    }
 }
