@@ -1,0 +1,7 @@
+{
+  "FileVersion": 3,
+  "EngineAssociation": "5.4",
+  "Category": "Games",
+  "Description": "THE LAST SIGNAL - first-person survival horror prototype",
+  "Modules": [{"Name": "TheLastSignal", "Type": "Runtime", "LoadingPhase": "Default"}]
+}
