@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_FILES = (
     "THE_LAST_SIGNAL.uproject", "Config/DefaultEngine.ini", "Config/DefaultInput.ini",
-    "Scripts/create_relay_station_map.py",
+    "Scripts/create_relay_station_map.py", "Scripts/qa_relay_station.py",
     "Source/TheLastSignal/TheLastSignal.Build.cs", "Source/TheLastSignal/Private/TheLastSignal.cpp",
     "Source/TheLastSignal/Public/LastSignalCharacter.h", "Source/TheLastSignal/Private/LastSignalCharacter.cpp",
     "Source/TheLastSignal/Public/SignalInteractable.h", "Source/TheLastSignal/Private/SignalInteractable.cpp",
@@ -74,6 +74,12 @@ def validate_repository(root: Path) -> list[str]:
         for token in ("LVL_RelayStation01", "PlayerStart", "NavMeshBoundsVolume", "GameDefaultMap", "EditorStartupMap", "save_current_level", "RuntimeGeneration", "Dynamic", "SignalBatteryPickup", "SignalInteractable", "SignalStalker"):
             if token not in source:
                 errors.append(f"Scripts/create_relay_station_map.py missing expected element: {token}")
+    qa_script = root / "Scripts/qa_relay_station.py"
+    if qa_script.is_file():
+        source = qa_script.read_text(encoding="utf-8")
+        for token in ("get_editor_world", "PlayerStart", "NavMeshBoundsVolume", "SignalInteractable", "SignalBatteryPickup", "SignalStalker", "RelayStation01_QA.json", "all(checks.values())"):
+            if token not in source:
+                errors.append(f"Scripts/qa_relay_station.py missing expected element: {token}")
     hud_path = root / "Source/TheLastSignal/Private/LastSignalHUD.cpp"
     if hud_path.is_file() and "\\n        const float HealthY" in hud_path.read_text(encoding="utf-8"):
         errors.append("LastSignalHUD.cpp contains literal escaped newlines in the health HUD block")
@@ -85,7 +91,7 @@ def main() -> int:
         for error in errors:
             print(f" - {error}")
         return 1
-    print("VALIDATION PASSED: UE metadata, editor map automation, first-area builder, objectives, pickups, HUD, enemy AI, animation/audio hooks, and input mappings.")
+    print("VALIDATION PASSED: UE metadata, map creation and in-editor QA automation, first-area builder, objectives, pickups, HUD, enemy AI, animation/audio hooks, and input mappings.")
     print("Scope: static repository checks only; no Unreal build or runtime test was performed.")
     return 0
 if __name__ == "__main__":
