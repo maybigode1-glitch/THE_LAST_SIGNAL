@@ -25,7 +25,7 @@ The script can be run again safely: it removes and recreates only actors whose l
 - A NavMeshBoundsVolume centered over the floor and scaled to cover the play area.
 - One stalker AI actor in the eastern maintenance hall.
 
-The environment uses Unreal's built-in Engine BasicShapes cube; no imported environment art is required. The stalker still needs its skeletal mesh, Animation Blueprint, montage, and sound assets assigned.
+The environment uses Unreal's built-in Engine BasicShapes cube; no imported environment art is required. The stalker now renders as a visible greybox cube until a skeletal mesh is assigned. It still needs a skeletal mesh, Animation Blueprint, montage, and sound assets for final character presentation and animation.
 
 ## Manual fallback
 If Python automation is unavailable:
@@ -51,5 +51,5 @@ If Python automation is unavailable:
 ## Current limitations / QA
 - The Python script must be run inside Unreal Editor; ordinary system Python cannot create a valid `.umap`.
 - NavMeshBoundsVolume is placed automatically and the script sets Recast `RuntimeGeneration=Dynamic`, so the navigation mesh can be generated at runtime inside its bounds. The script also requests an editor build where that API is available. For editor visualization or a static bake, use **Build > Build Paths** and inspect with **P**. Dynamic generation is a fallback for playability, not proof that a baked navmesh was produced.
-- The stalker AI actor has no assigned skeletal mesh in this greybox map; it may be invisible until art is assigned.
+- The stalker AI actor has a visible cube placeholder so its position and approach can be tested without art assets. It has no skeletal mesh/Animation Blueprint, so it does not yet animate as a creature.
 - No Unreal compilation, script execution, editor launch, packaged build, or runtime playtest has been performed in this environment.
