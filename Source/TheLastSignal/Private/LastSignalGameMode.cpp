@@ -1,7 +1,12 @@
 #include "LastSignalGameMode.h"
 #include "LastSignalCharacter.h"
+#include "LastSignalHUD.h"
 #include "Engine/Engine.h"
-ALastSignalGameMode::ALastSignalGameMode() { DefaultPawnClass = ALastSignalCharacter::StaticClass(); }
+ALastSignalGameMode::ALastSignalGameMode()
+{
+    DefaultPawnClass = ALastSignalCharacter::StaticClass();
+    HUDClass = ALastSignalHUD::StaticClass();
+}
 void ALastSignalGameMode::RegisterSignalCollected()
 {
     if (AreObjectivesComplete()) return;
