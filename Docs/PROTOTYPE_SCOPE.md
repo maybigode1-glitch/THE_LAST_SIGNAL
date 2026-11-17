@@ -5,16 +5,12 @@
 - E interaction using a Visibility-channel line trace.
 - F flashlight with finite charge; it drains while switched on and turns off at zero.
 - Battery-pack inventory: interact with a battery pickup using E; press R to consume one pack and restore up to 35 percentage points of flashlight charge.
-- Blueprintable `ASignalBatteryPickup` actor. Set `PacksGranted` in a child Blueprint to change the pickup amount.
-- Signal objectives: each successfully activated standard `ASignalInteractable` increments progress in `ALastSignalGameMode`. The default objective is 3 signals; `RequiredSignals` is configurable in a GameMode Blueprint.
-- Blueprint-readable getters expose flashlight charge, inventory count, and objective progress/completion.
-- Native C++ survival HUD (`ALastSignalHUD`) draws flashlight percentage and state, spare battery count, player health, signal objective progress, completion state, and a small center reticle. It is assigned by default in `ALastSignalGameMode`.
-- Blueprintable `ASignalStalker` enemy uses an `AAIController` and navigation: it patrols near its spawn point, detects the player by line of sight inside its detection radius, pursues while visible, investigates the last known position after losing sight, then returns to its patrol area.
-- The stalker performs timed melee attacks inside its attack radius. Damage is applied through Unreal's damage system.
-- Player health starts at 100; reaching zero triggers the death state, disables movement/look and switches off the flashlight. Health is displayed in the HUD.
-- Stalker tuning is exposed to Blueprints: detection radius, attack range, attack interval, damage, patrol radius and movement speed (via CharacterMovement).
-- `USignalStalkerAnimInstance` exposes `GroundSpeed`, `bIsMoving`, `bIsChasing`, `bIsSearching`, `bIsAttacking` and `bIsDead` to an Animation Blueprint. The enemy can play an assigned `AttackMontage` when it attacks.
-- Configurable audio hooks are exposed for footsteps, alert, attack, search, ambient loop and chase loop. Footsteps are triggered by travelled distance; one-shot cues are played at the enemy location; the loop component switches between ambient and chase sounds.
+- Blueprintable `ASignalBatteryPickup` actor.
+- Signal objectives: each successfully activated standard `ASignalInteractable` increments progress in `ALastSignalGameMode`. Default target: 3.
+- Native C++ survival HUD displays flashlight, inventory, health, signal progress, and a reticle.
+- `ASignalStalker` patrols, detects by line of sight, pursues, searches last-known location, and attacks.
+- `USignalStalkerAnimInstance` exposes movement/chase/search/attack state; montage and six audio hooks are configurable.
+- `ASignalPrototypeArea` procedurally assembles the Relay Station 01 greybox at runtime using the Engine BasicShapes cube: floor, perimeter, broken partitions, cover, three signal terminals, two battery pickups, and a temporary enemy silhouette.
 
 ## Input
 | Key | Action |
@@ -25,27 +21,29 @@
 | F | Toggle flashlight |
 | R | Use one battery pack |
 
-## Editor setup still required
-1. Open `THE_LAST_SIGNAL.uproject` with Unreal Engine 5.4 or a compatible 5.x installation.
-2. Generate IDE project files and compile the TheLastSignal module.
-3. Create `Content/Maps/LVL_Prototype`, add a PlayerStart, and set it as the startup map.
-4. Create a child Blueprint of `ASignalInteractable` for a signal objective; assign a visible Static Mesh that blocks Visibility.
-5. Create a child Blueprint of `ASignalBatteryPickup`; assign a battery-shaped mesh that blocks Visibility. Place several in the level.
-6. Optionally create a child GameMode Blueprint and set the required signal count.
-7. Add a `NavMeshBoundsVolume` covering walkable floor space and build navigation (press P in the editor to inspect the green navigable area).
-8. Place one or more `ASignalStalker` actors inside the navigable area. Create a child Blueprint and assign a Skeletal Mesh with a skeleton.
-9. Create an Animation Blueprint whose parent class is `USignalStalkerAnimInstance`. Build a locomotion state machine using `GroundSpeed`/`bIsMoving`; use `bIsChasing` and `bIsSearching` to tune locomotion, and connect an attack state or slot to an attack animation. Assign this Animation Blueprint to the enemy mesh. Create an Animation Montage for the attack and assign it to `AttackMontage` on the enemy Blueprint.
-10. Import or create sound assets and assign them in the enemy Blueprint: short one-shots for `FootstepSound`, `AlertSound`, `AttackSound` and `SearchSound`; looping sounds for `AmbientLoopSound` and `ChaseLoopSound`. Enable looping on loop assets and configure attenuation/spatialisation on the sound assets.
-11. Set the map's GameMode override to `ALastSignalGameMode` or its Blueprint child, then test E/F/R and enemy behaviour. The HUD is registered automatically by this GameMode.
+## First playable area setup
+Follow [FIRST_PLAYABLE_AREA.md](FIRST_PLAYABLE_AREA.md). In summary:
+1. Compile the C++ project in Unreal Engine 5.4.
+2. Create `Content/Maps/LVL_RelayStation01`.
+3. Place one `ASignalPrototypeArea` actor at the origin.
+4. Place a `PlayerStart` at approximately (-1200, 0, 100), facing +X.
+5. Add a `NavMeshBoundsVolume` over the 30 m x 22 m floor and build navigation.
+6. Use `LastSignalGameMode` and set the level as the startup/game default map.
+7. Press Play and test movement, E/F/R, the three terminals, pickups, and stalker.
+
+## Enemy art setup
+See [STALKER_ANIMATION_AUDIO_SETUP.md](STALKER_ANIMATION_AUDIO_SETUP.md) to assign a skeletal mesh, Animation Blueprint, attack montage, and audio assets.
 
 ## Acceptance checklist
 - [ ] Project opens and C++ module compiles in UE 5.4.
+- [ ] Relay Station 01 level is created with builder, PlayerStart, and NavMeshBoundsVolume.
 - [ ] Character spawns and movement/look work.
-- [ ] E collects a battery pack once; the pickup disappears.
-- [ ] R consumes a pack only when flashlight charge is below 100%; charge increases by up to 35.
+- [ ] E activates each of three terminals once; objective completes at 3/3.
+- [ ] E collects both battery packs; R restores flashlight charge.
 - [ ] F toggles the light and charge drains while active.
-- [ ] HUD displays live flashlight charge, inventory count, and signal progress.
-- [ ] Activating each signal increments objective progress once; completion occurs at the configured target.
+- [ ] Stalker navigates, detects, chases, searches, and damages the player.
+- [ ] HUD displays live flashlight, inventory, health, and objective status.
+- [ ] Enemy mesh, animations, and sounds are assigned and tested.
 
 ## Scope boundary
-These are source-code systems, not a finished level or playable release. No binary Unreal map, skeletal mesh, animation clips, montage, or audio recordings are bundled yet. The C++ animation/audio integration is present, but asset assignment and runtime QA remain pending.
+The runtime builder is C++ source, not a saved binary `.umap`. The level still needs to be created in Unreal Editor, and navigation needs a placed/built NavMeshBoundsVolume. The stalker silhouette is temporary. No Unreal compilation, editor startup, packaged build, or runtime playtest has been performed in this environment.
