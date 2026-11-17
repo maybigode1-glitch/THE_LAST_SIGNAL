@@ -52,9 +52,10 @@ class RepositoryContractTests(unittest.TestCase):
         header = (ROOT / "Source/TheLastSignal/Public/SignalStalkerAnimInstance.h").read_text(encoding="utf-8")
         source = (ROOT / "Source/TheLastSignal/Private/SignalStalkerAnimInstance.cpp").read_text(encoding="utf-8")
         enemy = (ROOT / "Source/TheLastSignal/Private/SignalStalker.cpp").read_text(encoding="utf-8")
-        for token in ("GroundSpeed", "bIsChasing", "bIsSearching", "bIsAttacking"):
+        for token in ("GroundSpeed", "bIsMoving", "bIsChasing", "bIsSearching", "bIsAttacking", "bIsDead"):
             self.assertIn(token, header)
-            self.assertIn(token.replace("bIs", "Is"), source) if token != "GroundSpeed" else self.assertIn(token, source)
+        for token in ("GroundSpeed", "IsChasing", "IsSearching", "IsAttacking", "IsDead"):
+            self.assertIn(token, source)
         self.assertIn("Montage_Play", enemy)
     def test_stalker_audio_cues_are_configurable_and_triggered(self):
         header = (ROOT / "Source/TheLastSignal/Public/SignalStalker.h").read_text(encoding="utf-8")
