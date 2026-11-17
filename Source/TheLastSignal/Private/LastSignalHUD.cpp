@@ -12,7 +12,7 @@ void ALastSignalHUD::DrawHUD()
     Super::DrawHUD();
     if (!Canvas) return;
 
-    const ALastSignalCharacter* Character = Cast<ALastSignalCharacter>(GetOwningPawn());
+    const ALastSignalCharacter* Character = GetOwningPlayerController() ? Cast<ALastSignalCharacter>(GetOwningPlayerController()->GetPawn()) : nullptr;
     const ALastSignalGameMode* Mode = GetWorld() ? GetWorld()->GetAuthGameMode<ALastSignalGameMode>() : nullptr;
     const float Scale = FMath::Clamp(Canvas->ClipY / 1080.0f, 0.75f, 1.35f);
     const float Left = 36.0f * Scale;
@@ -24,8 +24,8 @@ void ALastSignalHUD::DrawHUD()
 
     auto DrawLabel = [this, Font, Scale](const FString& Text, float X, float Y, const FLinearColor& Color)
     {
-        const FLinearColor PreviousColor = Canvas->DrawColor;
-        Canvas->DrawColor = Color;
+        const FColor PreviousColor = Canvas->DrawColor;
+        Canvas->DrawColor = Color.ToFColor(true);
         Canvas->DrawText(Font, Text, X, Y, Scale, Scale);
         Canvas->DrawColor = PreviousColor;
     };
