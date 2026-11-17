@@ -37,6 +37,8 @@ class RepositoryContractTests(unittest.TestCase):
         game_mode = (ROOT / "Source/TheLastSignal/Private/LastSignalGameMode.cpp").read_text(encoding="utf-8")
         self.assertIn("RegisterSignalCollected", interactable)
         self.assertIn("AreObjectivesComplete", game_mode)
+        self.assertIn("Cast<ALastSignalCharacter>(InteractingActor)", interactable)
+        self.assertIn("if (!Mode || Mode->AreObjectivesComplete()) return;", interactable)
     def test_survival_hud_displays_battery_inventory_and_objectives(self):
         hud = (ROOT / "Source/TheLastSignal/Private/LastSignalHUD.cpp").read_text(encoding="utf-8")
         mode = (ROOT / "Source/TheLastSignal/Private/LastSignalGameMode.cpp").read_text(encoding="utf-8")
@@ -67,6 +69,9 @@ class RepositoryContractTests(unittest.TestCase):
         for token in ("GroundSpeed", "IsChasing", "IsSearching", "IsAttacking", "IsDead"):
             self.assertIn(token, source)
         self.assertIn("Montage_Play", enemy)
+        self.assertIn("ApplyAttackDamage", enemy)
+        self.assertIn("AttackImpactTimer", enemy)
+        self.assertIn("AttackRange + 75.0f", enemy)
     def test_stalker_audio_cues_are_configurable_and_triggered(self):
         header = (ROOT / "Source/TheLastSignal/Public/SignalStalker.h").read_text(encoding="utf-8")
         source = (ROOT / "Source/TheLastSignal/Private/SignalStalker.cpp").read_text(encoding="utf-8")
