@@ -1,5 +1,6 @@
 #include "SignalInteractable.h"
 #include "LastSignalGameMode.h"
+#include "LastSignalCharacter.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
@@ -13,10 +14,20 @@ ASignalInteractable::ASignalInteractable()
 }
 void ASignalInteractable::Interact_Implementation(AActor* InteractingActor)
 {
-    if (bHasBeenActivated) return;
+    if (bHasBeenActivated || !Cast<ALastSignalCharacter>(InteractingActor)) return;
+
+    UWorld* World = GetWorld();
+    ALastSignalGameMode* Mode = World ? World->GetAuthGameMode<ALastSignalGameMode>() : nullptr;
+    if (!Mode || Mode->AreObjectivesComplete()) return;
+
+    Mode->RegisterSignalCollected();
     bHasBeenActivated = true;
-    if (UWorld* World = GetWorld())
-        if (ALastSignalGameMode* Mode = World->GetAuthGameMode<ALastSignalGameMode>()) Mode->RegisterSignalCollected();
-    UE_LOG(LogTemp, Log, TEXT("Signal interaction activated: %s"), *GetName());
-    if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.5f, FColor::Green, FString::Printf(TEXT("Signal acquired: %s"), *InteractionName.ToString()));
+    UE_LOG(LogTemp, Log, TEXT("Relay terminal activated: %s"), *GetName());
+    if (GEngine)
+    {
+        GEngine->AddOnScreenDebugMessage(
+            -1, 2.5f, FColor::Green,
+            FString::Printf(TEXT("TERMINAL ONLINE: %s"), *InteractionName.ToString())
+        );
+    }
 }
