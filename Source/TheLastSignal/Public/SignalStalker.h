@@ -85,4 +85,5 @@ private:
     bool bIsSearching = false;
     bool bIsAttacking = false;
     bool bIsDead = false;
+    FTimerHandle AttackStateTimer;
 };
