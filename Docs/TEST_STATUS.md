@@ -16,12 +16,14 @@
 - [x] Runtime greybox builder source for Relay Station 01.
 - [x] Unreal Editor Python automation script for persistent level geometry, objectives, pickups, PlayerStart, NavMeshBoundsVolume, stalker AI, and map startup configuration.
 - [x] PythonScriptPlugin and EditorScriptingUtilities enabled in the project descriptor.
-- [x] First-area automation guide and repository validator/test coverage.\n- [x] Unreal Editor structural QA script for the generated Relay Station map, with a JSON report and explicit pass/fail checks.
+- [x] First-area automation guide and repository validator/test coverage.
+- [x] Unreal Editor structural QA script for the generated Relay Station map, with a JSON report and explicit pass/fail checks.
 
 ## Validation still pending
 - [x] Execute repository Python validator and unit tests in GitHub Actions; latest run passed (17 unit tests).
 - [x] Review successful GitHub Actions run: [run 44010455595](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/actions/runs/44010455595).
-- [ ] Run `Scripts/qa_relay_station.py` inside Unreal Editor after generating the map; inspect `Saved/RelayStation01_QA.json`.\n- [ ] Generate project files and compile with UnrealBuildTool on UE 5.4.
+- [ ] Run `Scripts/qa_relay_station.py` inside Unreal Editor after generating the map; inspect `Saved/RelayStation01_QA.json`.
+- [ ] Generate project files and compile with UnrealBuildTool on UE 5.4.
 - [ ] Run `Scripts/create_relay_station_map.py` inside Unreal Editor and verify that the `.umap` is saved.
 - [ ] Verify PlayerStart spawn and GameMode/HUD selection.
 - [ ] Verify NavMesh generation (press P; use Build > Build Paths if needed).
