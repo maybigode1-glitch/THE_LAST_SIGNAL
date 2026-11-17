@@ -47,7 +47,7 @@ def validate_repository(root: Path) -> list[str]:
         "Source/TheLastSignal/Private/SignalBatteryPickup.cpp": ("ASignalBatteryPickup", "AddBatteryPack", "Destroy()"),
         "Source/TheLastSignal/Private/LastSignalGameMode.cpp": ("RegisterSignalCollected", "AreObjectivesComplete", "ALastSignalHUD::StaticClass"),
         "Source/TheLastSignal/Private/LastSignalHUD.cpp": ("GetFlashlightBatteryPercent", "GetBatteryPackCount", "GetSignalsCollected", "GetRequiredSignals", "DrawHUD", "FLASHLIGHT", "SPARE BATTERIES"),
-        "Source/TheLastSignal/Private/SignalInteractable.cpp": ("RegisterSignalCollected", "bHasBeenActivated"),\n        "Source/TheLastSignal/Private/SignalStalker.cpp": ("AAIController", "LineOfSightTo", "MoveToActor", "MoveToLocation", "PerformAttack", "TakeDamage", "GetRandomReachablePointInRadius"),\n        "Source/TheLastSignal/Private/LastSignalCharacter.cpp": ("TakeDamage", "Health", "bIsDead", "YOU DIED"),\n        "Source/TheLastSignal/Private/LastSignalHUD.cpp": ("GetHealthPercent", "HEALTH"),
+        "Source/TheLastSignal/Private/SignalInteractable.cpp": ("RegisterSignalCollected", "bHasBeenActivated"),\n        "Source/TheLastSignal/Private/SignalStalker.cpp": ("AAIController", "LineOfSightTo", "MoveToActor", "MoveToLocation", "PerformAttack", "TakeDamage", "GetRandomReachablePointInRadius"),\n        "Source/TheLastSignal/Private/LastSignalCharacter.cpp": ("USpotLightComponent", "ToggleFlashlight", "FlashlightDrainPerSecond", "AddBatteryPack", "UseBatteryPack", "TakeDamage", "Health", "bIsDead", "YOU DIED"),\n        "Source/TheLastSignal/Private/LastSignalHUD.cpp": ("GetHealthPercent", "HEALTH"),
     }
     for relative, tokens in checks.items():
         path = root / relative
