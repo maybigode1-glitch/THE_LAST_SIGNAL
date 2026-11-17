@@ -9,6 +9,7 @@ The repository now contains a minimal Unreal C++ project foundation:
 - First-person character and camera.
 - WASD movement and mouse look through legacy input mappings.
 - E-key interaction via a visibility-channel line trace.
+- Camera-mounted flashlight toggled with F, with a finite battery that drains while active.
 - Blueprintable signal-interactable actor with a Blueprint-native interaction event.
 - GameMode that spawns the prototype character.
 
