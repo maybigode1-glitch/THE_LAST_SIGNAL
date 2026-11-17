@@ -17,6 +17,17 @@ class ValidateProjectTests(unittest.TestCase):
             path.write_text(json.dumps({"EngineAssociation": "5.4", "Modules": [{"Name": "TheLastSignal", "Type": "Runtime"}], "Plugins": [{"Name": "PythonScriptPlugin", "Enabled": True}, {"Name": "EditorScriptingUtilities", "Enabled": True}]}), encoding="utf-8")
             self.assertEqual(MODULE.validate_uproject(path), [])
 
+    def test_missing_editor_automation_plugins_are_reported(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "sample.uproject"
+            path.write_text(json.dumps({
+                "EngineAssociation": "5.4",
+                "Modules": [{"Name": "TheLastSignal", "Type": "Runtime"}],
+                "Plugins": [{"Name": "PythonScriptPlugin", "Enabled": True}],
+            }), encoding="utf-8")
+            errors = MODULE.validate_uproject(path)
+            self.assertTrue(any("EditorScriptingUtilities" in error for error in errors))
+
     def test_missing_engine_association_is_reported(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "sample.uproject"
