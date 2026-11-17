@@ -65,7 +65,7 @@ void ALastSignalHUD::DrawHUD()
         const int32 Required = Mode->GetRequiredSignals();
         const FString Objective = Mode->AreObjectivesComplete()
             ? TEXT("SIGNAL NETWORK RESTORED")
-            : FString::Printf(TEXT("RECOVER SIGNALS  %d / %d"), Current, Required);
+            : FString::Printf(TEXT("ACTIVATE RELAYS  %d / %d"), Current, Required);
         const float TextWidth = 270.0f * Scale;
         const float X = FMath::Max(Left, Canvas->ClipX - TextWidth - Left);
         DrawLabel(Objective, X, Top, Mode->AreObjectivesComplete() ? FLinearColor(0.25f, 1.0f, 0.55f, 1.0f) : FLinearColor::White);
