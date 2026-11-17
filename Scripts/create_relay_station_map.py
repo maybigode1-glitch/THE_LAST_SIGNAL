@@ -197,6 +197,13 @@ def build_level():
         },
     )
 
+    # Dynamic Recast generation ensures the placed bounds volume can generate runtime navigation.
+    update_ini_section(
+        DEFAULT_ENGINE_INI,
+        "/Script/NavigationSystem.RecastNavMesh",
+        {"RuntimeGeneration": "Dynamic"},
+    )
+
     # Ask the editor to build level data (including navigation where supported by this UE version).
     try:
         unreal.EditorLevelLibrary.editor_build()
