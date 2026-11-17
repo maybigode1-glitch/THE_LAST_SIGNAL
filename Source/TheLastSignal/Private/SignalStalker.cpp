@@ -188,11 +188,33 @@ void ASignalStalker::PerformAttack()
         }
     }
     PlayOneShot(AttackSound);
-    Player->TakeDamage(AttackDamage, FDamageEvent(), GetController(), this);
     NextAttackTime = GetWorld()->GetTimeSeconds() + AttackInterval;
+
+    // Telegraph the attack before applying damage so the player has a readable reaction window.
+    const float AttackImpactDelay = AttackMontage
+        ? FMath::Clamp(AttackMontage->GetPlayLength() * 0.35f, 0.2f, 0.6f)
+        : 0.3f;
+    GetWorldTimerManager().SetTimer(
+        AttackImpactTimer, this, &ASignalStalker::ApplyAttackDamage, AttackImpactDelay, false
+    );
 
     const float AttackStateDuration = AttackMontage ? FMath::Max(0.25f, AttackMontage->GetPlayLength()) : 0.45f;
     GetWorldTimerManager().SetTimer(AttackStateTimer, this, &ASignalStalker::ClearAttackState, AttackStateDuration, false);
+}
+
+void ASignalStalker::ApplyAttackDamage()
+{
+    if (!GetWorld()) return;
+
+    ALastSignalCharacter* Player = Cast<ALastSignalCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+    if (!Player || Player->IsDead()) return;
+
+    // The player can dodge during the wind-up; damage only lands if still in melee range and visible.
+    const float Distance = FVector::Dist(GetActorLocation(), Player->GetActorLocation());
+    AAIController* AI = Cast<AAIController>(GetController());
+    if (Distance > AttackRange + 75.0f || (AI && !AI->LineOfSightTo(Player))) return;
+
+    Player->TakeDamage(AttackDamage, FDamageEvent(), GetController(), this);
 }
 
 void ASignalStalker::ClearAttackState()
