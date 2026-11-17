@@ -6,6 +6,9 @@
 - [x] First-person C++ character, camera, movement, and mouse look added.
 - [x] E-key line-trace interaction and Blueprintable interactable actor added.
 - [x] GameMode configured to use the prototype character.
+- [x] Camera-mounted flashlight with F-key toggle and draining battery implemented in C++.
+- [x] Repository validator checks flashlight source markers and input mapping.
+- [x] Python source-contract test covers flashlight binding and battery depletion logic.
 - [x] Repository validator checks project metadata and required source files.
 - [x] Python unit tests cover metadata validation and repository structure.
 - [x] GitHub Actions workflow added.
