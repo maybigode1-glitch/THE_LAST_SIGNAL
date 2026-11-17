@@ -9,6 +9,7 @@
 - [x] Native C++ survival HUD source for flashlight, inventory, health, objectives, and reticle.
 - [x] Stalker AI source for patrol, sight detection, pursuit, search, and melee attacks.
 - [x] Melee attack wind-up: damage is delayed to an impact window and cancelled by player movement out of range/line of sight.
+- [x] Visible cube placeholder for the stalker when no skeletal mesh is assigned.
 - [x] Player health, damage, death state, and HUD health display.
 - [x] Animation instance state and montage hooks for the stalker.
 - [x] Configurable enemy audio hooks for footsteps, alert, attack, search, ambient, and chase.
