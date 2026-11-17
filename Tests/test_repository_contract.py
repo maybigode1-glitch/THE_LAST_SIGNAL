@@ -28,6 +28,14 @@ class RepositoryContractTests(unittest.TestCase):
         game_mode = (ROOT / "Source/TheLastSignal/Private/LastSignalGameMode.cpp").read_text(encoding="utf-8")
         self.assertIn("RegisterSignalCollected", interactable)
         self.assertIn("AreObjectivesComplete", game_mode)
+    def test_survival_hud_displays_battery_inventory_and_objectives(self):
+        hud = (ROOT / "Source/TheLastSignal/Private/LastSignalHUD.cpp").read_text(encoding="utf-8")
+        mode = (ROOT / "Source/TheLastSignal/Private/LastSignalGameMode.cpp").read_text(encoding="utf-8")
+        self.assertIn("GetFlashlightBatteryPercent", hud)
+        self.assertIn("GetBatteryPackCount", hud)
+        self.assertIn("GetSignalsCollected", hud)
+        self.assertIn("GetRequiredSignals", hud)
+        self.assertIn("ALastSignalHUD::StaticClass", mode)
     def test_missing_source_file_is_reported(self):
         import tempfile
         with tempfile.TemporaryDirectory() as tmp:
