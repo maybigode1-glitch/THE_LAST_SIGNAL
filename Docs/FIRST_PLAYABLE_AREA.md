@@ -49,6 +49,6 @@ If Python automation is unavailable:
 
 ## Current limitations / QA
 - The Python script must be run inside Unreal Editor; ordinary system Python cannot create a valid `.umap`.
-- NavMeshBoundsVolume is placed automatically. Navigation data generation is requested through the editor build API where available; if it is not generated, use **Build > Build Paths** and inspect with **P**.
+- NavMeshBoundsVolume is placed automatically and the script sets Recast `RuntimeGeneration=Dynamic`, so the navigation mesh can be generated at runtime inside its bounds. The script also requests an editor build where that API is available. For editor visualization or a static bake, use **Build > Build Paths** and inspect with **P**. Dynamic generation is a fallback for playability, not proof that a baked navmesh was produced.
 - The stalker AI actor has no assigned skeletal mesh in this greybox map; it may be invisible until art is assigned.
 - No Unreal compilation, script execution, editor launch, packaged build, or runtime playtest has been performed in this environment.
