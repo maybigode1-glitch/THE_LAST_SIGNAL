@@ -6,6 +6,7 @@
 
 class UAnimMontage;
 class UAudioComponent;
+class UStaticMeshComponent;
 class USoundBase;
 
 UCLASS(Blueprintable)
@@ -73,6 +74,9 @@ private:
 
     UPROPERTY(VisibleAnywhere, Category = "Audio")
     TObjectPtr<UAudioComponent> LoopAudio;
+
+    UPROPERTY(VisibleAnywhere, Category = "Components")
+    TObjectPtr<UStaticMeshComponent> GreyboxVisual;
 
     FVector HomeLocation = FVector::ZeroVector;
     FVector LastKnownPlayerLocation = FVector::ZeroVector;
