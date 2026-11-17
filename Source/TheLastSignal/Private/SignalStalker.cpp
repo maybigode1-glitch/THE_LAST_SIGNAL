@@ -7,6 +7,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/StaticMeshComponent.h"
+#include "UObject/ConstructorHelpers.h"
 #include "Components/AudioComponent.h"
 #include "Animation/AnimInstance.h"
 #include "Animation/AnimMontage.h"
@@ -23,6 +25,18 @@ ASignalStalker::ASignalStalker()
     GetCharacterMovement()->bOrientRotationToMovement = true;
     bUseControllerRotationYaw = false;
 
+    // Keep the enemy visible in the greybox map until a proper skeletal mesh is assigned.
+    GreyboxVisual = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GreyboxVisual"));
+    GreyboxVisual->SetupAttachment(GetRootComponent());
+    GreyboxVisual->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
+    GreyboxVisual->SetRelativeScale3D(FVector(0.65f, 0.65f, 1.5f));
+    GreyboxVisual->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    static ConstructorHelpers::FObjectFinder<UStaticMesh> PlaceholderCube(TEXT("/Engine/BasicShapes/Cube.Cube"));
+    if (PlaceholderCube.Succeeded())
+    {
+        GreyboxVisual->SetStaticMesh(PlaceholderCube.Object);
+    }
+
     LoopAudio = CreateDefaultSubobject<UAudioComponent>(TEXT("StalkerLoopAudio"));
     LoopAudio->SetupAttachment(GetRootComponent());
     LoopAudio->bAutoActivate = false;
@@ -32,6 +46,8 @@ void ASignalStalker::BeginPlay()
 {
     Super::BeginPlay();
     HomeLocation = GetActorLocation();
+    if (GreyboxVisual && GetMesh() && GetMesh()->GetSkeletalMeshAsset())
+        GreyboxVisual->SetVisibility(false);
     LastFootstepLocation = GetActorLocation();
     NextDecisionTime = GetWorld() ? GetWorld()->GetTimeSeconds() : 0.0f;
     if (AmbientLoopSound && LoopAudio)
