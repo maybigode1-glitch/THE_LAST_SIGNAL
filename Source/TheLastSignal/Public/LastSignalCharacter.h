@@ -14,7 +14,7 @@ public:
     UFUNCTION(BlueprintPure, Category = "Flashlight") bool IsFlashlightOn() const { return bFlashlightOn; }
     UFUNCTION(BlueprintPure, Category = "Inventory") int32 GetBatteryPackCount() const { return BatteryPacks; }
     UFUNCTION(BlueprintCallable, Category = "Inventory") void AddBatteryPack(int32 Amount = 1);
-    UFUNCTION(BlueprintCallable, Category = "Inventory") bool UseBatteryPack();
+    UFUNCTION(BlueprintCallable, Category = "Inventory") void UseBatteryPack();
 protected:
     virtual void BeginPlay() override;
     virtual void Tick(float DeltaSeconds) override;
