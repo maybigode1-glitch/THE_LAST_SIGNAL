@@ -93,6 +93,7 @@ class RepositoryContractTests(unittest.TestCase):
         source = (ROOT / "Scripts/qa_relay_station.py").read_text(encoding="utf-8")
         for token in ("get_editor_world", "PlayerStart", "NavMeshBoundsVolume", "SignalInteractable", "SignalBatteryPickup", "SignalStalker", "RelayStation01_QA.json", "all(checks.values())"):
             self.assertIn(token, source)
+        compile(source, "qa_relay_station.py", "exec")
 
     def test_missing_source_file_is_reported(self):
         import tempfile
