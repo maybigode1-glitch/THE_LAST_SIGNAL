@@ -24,7 +24,9 @@ First-person survival-horror prototype built with Unreal Engine 5.4.
 
 The script is idempotent for its own generated actors: rerunning it opens the existing level and replaces actors with the `RS01_AUTO_` label prefix. It does not delete unrelated level actors.
 
-After map creation, run `Scripts/qa_relay_station.py` in the Editor to verify the expected actors and write `Saved/RelayStation01_QA.json`. This is structural QA, not a gameplay test.\n\nFull instructions: [Docs/FIRST_PLAYABLE_AREA.md](Docs/FIRST_PLAYABLE_AREA.md).
+After map creation, run `Scripts/qa_relay_station.py` in the Editor to verify the expected actors and write `Saved/RelayStation01_QA.json`. This is structural QA, not a gameplay test.
+
+Full instructions: [Docs/FIRST_PLAYABLE_AREA.md](Docs/FIRST_PLAYABLE_AREA.md).
 
 Enemy mesh, Animation Blueprint, montage, and sound assignment: [Docs/STALKER_ANIMATION_AUDIO_SETUP.md](Docs/STALKER_ANIMATION_AUDIO_SETUP.md).
 
