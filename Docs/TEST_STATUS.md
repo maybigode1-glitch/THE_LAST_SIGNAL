@@ -18,10 +18,10 @@
 - [x] PythonScriptPlugin and EditorScriptingUtilities enabled in the project descriptor.
 - [x] First-area automation guide and repository validator/test coverage.
 - [x] Unreal Editor structural QA script for the generated Relay Station map, with a JSON report and explicit pass/fail checks.
+- [x] Offline unit tests for the Editor QA report logic: passing actor set, missing stalker, and wrong map.
 
 ## Validation still pending
-- [x] Execute repository Python validator and unit tests in GitHub Actions; latest run passed (17 unit tests).
-- [x] Review successful GitHub Actions run: [run 44010455595](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/actions/runs/44010455595).
+- [x] Execute repository Python validator and unit tests in GitHub Actions; latest run passed (21 unit tests): [run 44085677543](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/actions/runs/44085677543).
 - [ ] Run `Scripts/qa_relay_station.py` inside Unreal Editor after generating the map; inspect `Saved/RelayStation01_QA.json`.
 - [ ] Generate project files and compile with UnrealBuildTool on UE 5.4.
 - [ ] Run `Scripts/create_relay_station_map.py` inside Unreal Editor and verify that the `.umap` is saved.
@@ -32,4 +32,4 @@
 - [ ] Assign skeletal mesh, Animation Blueprint, attack montage, and audio assets; test in runtime.
 - [ ] Produce Windows packaged build and perform gameplay QA.
 
-The Editor automation has been committed but has not been executed in Unreal here. Repository checks are static/Python checks only; they do not prove Unreal compilation, editor startup, map generation, runtime behavior, or packaging.
+The offline Editor-QA unit tests use a small Unreal Python API double to test the script's report/pass/fail logic; they do not execute Unreal Editor. Repository checks are static/Python checks only; they do not prove Unreal compilation, editor startup, map generation, runtime behavior, or packaging.
