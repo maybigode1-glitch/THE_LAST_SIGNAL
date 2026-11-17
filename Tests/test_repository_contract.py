@@ -36,7 +36,7 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertIn("GetSignalsCollected", hud)
         self.assertIn("GetRequiredSignals", hud)
         self.assertIn("ALastSignalHUD::StaticClass", mode)
-    def test_missing_source_file_is_reported(self):
+    def test_stalker_ai_has_patrol_chase_search_and_attack(self):\n        source = (ROOT / "Source/TheLastSignal/Private/SignalStalker.cpp").read_text(encoding="utf-8")\n        for token in ("LineOfSightTo", "MoveToActor", "MoveToLocation", "PerformAttack", "GetRandomReachablePointInRadius"):\n            self.assertIn(token, source)\n        self.assertIn("AIModule", (ROOT / "Source/TheLastSignal/TheLastSignal.Build.cs").read_text(encoding="utf-8"))\n    def test_player_health_and_death_are_connected_to_hud(self):\n        character = (ROOT / "Source/TheLastSignal/Private/LastSignalCharacter.cpp").read_text(encoding="utf-8")\n        hud = (ROOT / "Source/TheLastSignal/Private/LastSignalHUD.cpp").read_text(encoding="utf-8")\n        self.assertIn("TakeDamage", character)\n        self.assertIn("bIsDead", character)\n        self.assertIn("GetHealthPercent", hud)\n        self.assertIn("HEALTH", hud)\n    def test_missing_source_file_is_reported(self):
         import tempfile
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
