@@ -80,18 +80,18 @@ void ALastSignalCharacter::AddBatteryPack(int32 Amount)
     BatteryPacks = FMath::Clamp(BatteryPacks + Amount, 0, 99);
     if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Battery pack collected | Inventory: %d"), BatteryPacks));
 }
-bool ALastSignalCharacter::UseBatteryPack()
+void ALastSignalCharacter::UseBatteryPack()
 {
     if (BatteryPacks <= 0 || FlashlightBattery >= 100.0f)
     {
         if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, BatteryPacks <= 0 ? TEXT("No spare battery packs") : TEXT("Flashlight is already full"));
-        return false;
+        return;
     }
     --BatteryPacks;
     FlashlightBattery = FMath::Min(100.0f, FlashlightBattery + BatteryPackCharge);
     if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Flashlight recharged: %.0f%% | Packs: %d"), FlashlightBattery, BatteryPacks));
-    return true;
 }
+
 void ALastSignalCharacter::TryInteract()
 {
     if (!Controller || !GetWorld() || !FirstPersonCamera) return;
