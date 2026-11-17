@@ -12,18 +12,21 @@ First-person survival-horror prototype built with Unreal Engine 5.4.
 - Native C++ survival HUD showing flashlight charge/state, spare battery inventory, player health, signal objective progress/completion, and a center reticle.
 - `ASignalStalker` enemy: navigation patrol, line-of-sight detection, pursuit, last-known-position search, and timed melee attacks.
 - `USignalStalkerAnimInstance` exposes locomotion/chase/search/attack state; montage and six enemy audio hooks are configurable.
-- `ASignalPrototypeArea` builds the first industrial relay-station greybox at runtime: collision floor/walls, partitions, cover, three signal terminals, two battery pickups, and a temporary stalker silhouette.
+- `ASignalPrototypeArea` runtime greybox builder source.
+- Unreal Editor Python automation creates a saved `LVL_RelayStation01` map with editor-persistent floor/walls, partitions, cover, terminals, battery pickups, PlayerStart, NavMeshBoundsVolume, and a stalker AI actor.
 
-## First area
-Follow [Docs/FIRST_PLAYABLE_AREA.md](Docs/FIRST_PLAYABLE_AREA.md) to create `LVL_RelayStation01`, place the area builder and PlayerStart, add a NavMeshBoundsVolume, and set the startup map. The builder uses Unreal's built-in cube mesh and needs no imported environment art.
+## Automatically create the first map
+1. Open `THE_LAST_SIGNAL.uproject` in Unreal Engine 5.4 and let the C++ module compile.
+2. In the Editor, run `Scripts/create_relay_station_map.py` using **Tools > Execute Python Script**.
+3. The script creates/saves `/Game/Maps/LVL_RelayStation01`, updates Editor Startup Map and Game Default Map in `Config/DefaultEngine.ini`, and submits an editor build where supported.
+4. Press **P** to inspect NavMesh. If it is not built yet, use **Build > Build Paths**.
+5. Press Play. Use WASD/mouse, E to interact, F for flashlight, and R to use a spare battery.
+
+The script is idempotent for its own generated actors: rerunning it opens the existing level and replaces actors with the `RS01_AUTO_` label prefix. It does not delete unrelated level actors.
+
+Full instructions: [Docs/FIRST_PLAYABLE_AREA.md](Docs/FIRST_PLAYABLE_AREA.md).
 
 Enemy mesh, Animation Blueprint, montage, and sound assignment: [Docs/STALKER_ANIMATION_AUDIO_SETUP.md](Docs/STALKER_ANIMATION_AUDIO_SETUP.md).
-
-## Open in Unreal
-1. Install Unreal Engine 5.4 (or a compatible 5.x version).
-2. Open `THE_LAST_SIGNAL.uproject`.
-3. Allow Unreal to generate IDE project files and compile the C++ module.
-4. Follow [Docs/FIRST_PLAYABLE_AREA.md](Docs/FIRST_PLAYABLE_AREA.md).
 
 ## Repository checks
 ```bash
@@ -33,4 +36,4 @@ python -m unittest discover -s Tests -v
 GitHub Actions runs repository-level validation and Python unit tests on pushes and pull requests.
 
 ## Honest test boundary
-The area builder is source code, not a binary `.umap`. No Unreal compilation, editor launch, runtime playtest, or Windows packaging is claimed until verified. See [Docs/TEST_STATUS.md](Docs/TEST_STATUS.md).
+The editor automation script is committed but has not been executed in an Unreal Editor in this environment. No generated `.umap`, Unreal compilation, editor launch, runtime playtest, or Windows packaging is claimed until verified. See [Docs/TEST_STATUS.md](Docs/TEST_STATUS.md).
