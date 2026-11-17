@@ -12,7 +12,7 @@ The project enables Unreal's Python and Editor Scripting plugins. After opening 
 4. The script creates or opens `Content/Maps/LVL_RelayStation01`, then places editor-persistent cube geometry, three interactable signal terminals, two battery pickups, a PlayerStart, a NavMeshBoundsVolume, and the stalker AI class.
 5. It updates `Config/DefaultEngine.ini` with both `EditorStartupMap` and `GameDefaultMap`, retaining `LastSignalGameMode` as the global GameMode.
 6. Press **P** to display navigation. If navigation is not yet generated, choose **Build > Build Paths**, wait for completion, then press **P** again.
-7. Press Play.
+7. Run `Scripts/qa_relay_station.py` through **Tools > Execute Python Script**. Check the Output Log and `Saved/RelayStation01_QA.json`; all structural checks should report PASS.\n8. Press Play.
 
 The script can be run again safely: it removes and recreates only actors whose labels begin with `RS01_AUTO_`; unrelated actors are left untouched.
 
@@ -26,6 +26,12 @@ The script can be run again safely: it removes and recreates only actors whose l
 - One stalker AI actor in the eastern maintenance hall.
 
 The environment uses Unreal's built-in Engine BasicShapes cube; no imported environment art is required. The stalker now renders as a visible greybox cube until a skeletal mesh is assigned. It still needs a skeletal mesh, Animation Blueprint, montage, and sound assets for final character presentation and animation.
+
+## Automated editor QA
+
+After generating and opening the map, run `Scripts/qa_relay_station.py` through **Tools > Execute Python Script**. It checks that the expected map is open and that the editor world contains at least one PlayerStart, one NavMeshBoundsVolume, three SignalInteractable actors, two SignalBatteryPickup actors, and one SignalStalker. It writes a JSON report to `Saved/RelayStation01_QA.json` and raises an error if any structural check fails.
+
+This is a structural check only. It does not prove that navigation has built correctly, actors have usable collision, interactions work, AI can reach the player, C++ compiles, or the packaged game runs.
 
 ## Manual fallback
 If Python automation is unavailable:
