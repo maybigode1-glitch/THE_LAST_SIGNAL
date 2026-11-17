@@ -2,6 +2,7 @@
 #include "LastSignalCharacter.h"
 #include "LastSignalGameMode.h"
 #include "Engine/Canvas.h"
+#include "Engine/CanvasItem.h"
 #include "Engine/Engine.h"
 #include "Engine/Font.h"
 #include "GameFramework/PlayerController.h"
@@ -23,9 +24,10 @@ void ALastSignalHUD::DrawHUD()
 
     auto DrawLabel = [this, Font, Scale](const FString& Text, float X, float Y, const FLinearColor& Color)
     {
-        Canvas->DrawText(Font, Text, X, Y, Scale, Scale, FFontRenderInfo());
-        // DrawText uses the Canvas default tint; restore requested tint through the next tile/text item.
+        const FLinearColor PreviousColor = Canvas->DrawColor;
+        Canvas->DrawColor = Color;
         Canvas->DrawText(Font, Text, X, Y, Scale, Scale);
+        Canvas->DrawColor = PreviousColor;
     };
 
     DrawLabel(TEXT("THE LAST SIGNAL"), Left, Top, FLinearColor::White);
