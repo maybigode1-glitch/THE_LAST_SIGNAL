@@ -8,7 +8,11 @@
 - Blueprintable `ASignalBatteryPickup` actor. Set `PacksGranted` in a child Blueprint to change the pickup amount.
 - Signal objectives: each successfully activated standard `ASignalInteractable` increments progress in `ALastSignalGameMode`. The default objective is 3 signals; `RequiredSignals` is configurable in a GameMode Blueprint.
 - Blueprint-readable getters expose flashlight charge, inventory count, and objective progress/completion.
-- Native C++ survival HUD (`ALastSignalHUD`) draws flashlight percentage and state, spare battery count, signal objective progress, completion state, and a small center reticle. It is assigned by default in `ALastSignalGameMode`.
+- Native C++ survival HUD (`ALastSignalHUD`) draws flashlight percentage and state, spare battery count, player health, signal objective progress, completion state, and a small center reticle. It is assigned by default in `ALastSignalGameMode`.
+- Blueprintable `ASignalStalker` enemy uses an `AAIController` and navigation: it patrols near its spawn point, detects the player by line of sight inside its detection radius, pursues while visible, investigates the last known position after losing sight, then returns to its patrol area.
+- The stalker performs timed melee attacks inside its attack radius. Damage is applied through Unreal's damage system.
+- Player health starts at 100; reaching zero triggers the death state, disables movement/look and switches off the flashlight. Health is displayed in the HUD.
+- Stalker tuning is exposed to Blueprints: detection radius, attack range, attack interval, damage, patrol radius and movement speed (via CharacterMovement).
 
 ## Input
 | Key | Action |
