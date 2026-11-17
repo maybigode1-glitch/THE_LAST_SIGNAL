@@ -37,7 +37,8 @@ If Python automation is unavailable:
 - Leave the western service bay and locate the first relay terminal.
 - Search side rooms and cover for the two spare battery packs.
 - Avoid the stalker in the maintenance hall; break line of sight around partitions.
-- Activate all three terminals to restore the uplink.
+- Activate all three terminals to restore the uplink. Each terminal can only register once; battery pickups add inventory and do not advance terminal progress.
+- Watch the stalker wind up its melee attack: damage is applied after a short delay and only if the player remains within range and line of sight.
 
 ## Greybox coordinates
 - PlayerStart: (-1200, 0, 100)
