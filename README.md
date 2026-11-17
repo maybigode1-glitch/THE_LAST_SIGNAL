@@ -10,7 +10,10 @@ First-person survival-horror prototype built with Unreal Engine 5.4.
 - Press R to consume one pack and restore up to 35 percentage points of flashlight charge.
 - Signal objective counter in the GameMode; standard interactables count once toward the configurable target (default: 3).
 - Blueprint getters for flashlight charge, battery-pack count, and objective progress/completion.
-- Native C++ survival HUD showing flashlight charge/state, spare battery inventory, signal objective progress/completion, and a center reticle.
+- Native C++ survival HUD showing flashlight charge/state, spare battery inventory, player health, signal objective progress/completion, and a center reticle.
+- `ASignalStalker` enemy: AIController-driven navigation, patrol around its spawn point, line-of-sight detection, player pursuit, last-known-position search, and timed melee attacks.
+- Player health (100 by default), damage feedback, and death state; movement/look and flashlight controls are disabled on death.
+- AI/navigation module dependencies are enabled in the runtime module.
 
 The repository does not yet contain binary Unreal assets or a playable map. Create the test map and Blueprint instances in Unreal Editor using [Docs/PROTOTYPE_SCOPE.md](Docs/PROTOTYPE_SCOPE.md).
 
