@@ -12,7 +12,8 @@ The project enables Unreal's Python and Editor Scripting plugins. After opening 
 4. The script creates or opens `Content/Maps/LVL_RelayStation01`, then places editor-persistent cube geometry, three interactable signal terminals, two battery pickups, a PlayerStart, a NavMeshBoundsVolume, and the stalker AI class.
 5. It updates `Config/DefaultEngine.ini` with both `EditorStartupMap` and `GameDefaultMap`, retaining `LastSignalGameMode` as the global GameMode.
 6. Press **P** to display navigation. If navigation is not yet generated, choose **Build > Build Paths**, wait for completion, then press **P** again.
-7. Run `Scripts/qa_relay_station.py` through **Tools > Execute Python Script**. Check the Output Log and `Saved/RelayStation01_QA.json`; all structural checks should report PASS.\n8. Press Play.
+7. Run `Scripts/qa_relay_station.py` through **Tools > Execute Python Script**. Check the Output Log and `Saved/RelayStation01_QA.json`; all structural checks should report PASS.
+8. Press Play.
 
 The script can be run again safely: it removes and recreates only actors whose labels begin with `RS01_AUTO_`; unrelated actors are left untouched.
 
