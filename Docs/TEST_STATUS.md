@@ -19,8 +19,8 @@
 - [x] First-area automation guide and repository validator/test coverage.
 
 ## Validation still pending
-- [ ] Execute repository Python validator and unit tests and record results.
-- [ ] Review a successful GitHub Actions run.
+- [x] Execute repository Python validator and unit tests in GitHub Actions; latest run passed (17 unit tests).
+- [x] Review successful GitHub Actions run: [run 44010455595](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/actions/runs/44010455595).
 - [ ] Generate project files and compile with UnrealBuildTool on UE 5.4.
 - [ ] Run `Scripts/create_relay_station_map.py` inside Unreal Editor and verify that the `.umap` is saved.
 - [ ] Verify PlayerStart spawn and GameMode/HUD selection.
