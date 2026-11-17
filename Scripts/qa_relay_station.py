@@ -64,7 +64,7 @@ def run_qa():
     os.makedirs(os.path.dirname(report_path), exist_ok=True)
     with open(report_path, "w", encoding="utf-8") as handle:
         json.dump(report, handle, indent=2, sort_keys=True)
-        handle.write("\\n")
+        handle.write("\n")
 
     for name, passed in checks.items():
         log(("PASS" if passed else "FAIL") + ": " + name)
