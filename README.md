@@ -10,6 +10,7 @@ First-person survival-horror prototype built with Unreal Engine 5.4.
 - Press R to consume one pack and restore up to 35 percentage points of flashlight charge.
 - Signal objective counter in the GameMode; standard interactables count once toward the configurable target (default: 3).
 - Blueprint getters for flashlight charge, battery-pack count, and objective progress/completion.
+- Native C++ survival HUD showing flashlight charge/state, spare battery inventory, signal objective progress/completion, and a center reticle.
 
 The repository does not yet contain binary Unreal assets or a playable map. Create the test map and Blueprint instances in Unreal Editor using [Docs/PROTOTYPE_SCOPE.md](Docs/PROTOTYPE_SCOPE.md).
 
