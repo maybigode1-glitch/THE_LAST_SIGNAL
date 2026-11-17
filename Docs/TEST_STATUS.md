@@ -11,18 +11,20 @@
 - [x] Player health, damage, death state, and HUD health display.
 - [x] Animation instance state and montage hooks for the stalker.
 - [x] Configurable enemy audio hooks for footsteps, alert, attack, search, ambient, and chase.
-- [x] Runtime greybox builder source for Relay Station 01, including collision geometry, three signal terminals, two battery pickups, and a temporary enemy silhouette.
-- [x] First-area editor setup guide and repository validator/test coverage.
+- [x] Runtime greybox builder source for Relay Station 01.
+- [x] Unreal Editor Python automation script for persistent level geometry, objectives, pickups, PlayerStart, NavMeshBoundsVolume, stalker AI, and map startup configuration.
+- [x] PythonScriptPlugin and EditorScriptingUtilities enabled in the project descriptor.
+- [x] First-area automation guide and repository validator/test coverage.
 
 ## Validation still pending
-- [ ] Execute Python validator and unit tests in a local/hosted environment and record results.
+- [ ] Execute repository Python validator and unit tests and record results.
 - [ ] Review a successful GitHub Actions run.
 - [ ] Generate project files and compile with UnrealBuildTool on UE 5.4.
-- [ ] Create `Content/Maps/LVL_RelayStation01`, place `ASignalPrototypeArea` and PlayerStart, and set startup/game default map.
-- [ ] Place a NavMeshBoundsVolume over the floor and build navigation.
-- [ ] Open the level in Unreal Editor and verify geometry, collision, interaction reach, and spawn positions.
-- [ ] Verify enemy navigation, sight, pursuit, search, attack, and player death in runtime.
+- [ ] Run `Scripts/create_relay_station_map.py` inside Unreal Editor and verify that the `.umap` is saved.
+- [ ] Verify PlayerStart spawn and GameMode/HUD selection.
+- [ ] Verify NavMesh generation (press P; use Build > Build Paths if needed).
+- [ ] Verify collision, interaction reach, three terminals, two pickups, and stalker pathfinding in runtime.
 - [ ] Assign skeletal mesh, Animation Blueprint, attack montage, and audio assets; test in runtime.
 - [ ] Produce Windows packaged build and perform gameplay QA.
 
-Repository checks are static/Python checks only. They do not prove Unreal compilation, editor startup, runtime behavior, or packaging.
+The Editor automation has been committed but has not been executed in Unreal here. Repository checks are static/Python checks only; they do not prove Unreal compilation, editor startup, map generation, runtime behavior, or packaging.
