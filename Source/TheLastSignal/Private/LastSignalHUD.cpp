@@ -45,7 +45,18 @@ void ALastSignalHUD::DrawHUD()
         Fill.BlendMode = SE_BLEND_Translucent;
         Canvas->DrawItem(Fill);
         DrawLabel(FString::Printf(TEXT("FLASHLIGHT  %3.0f%%  [%s]"), Battery, *LightState), Left, BarY + Height + 5.0f * Scale, FLinearColor::White);
-        DrawLabel(FString::Printf(TEXT("SPARE BATTERIES  x%d  (R)"), Character->GetBatteryPackCount()), Left, BarY + Height + 29.0f * Scale, FLinearColor::White);\n        const float HealthY = BarY + Height + 53.0f * Scale;\n        const float Health = FMath::Clamp(Character->GetHealthPercent(), 0.0f, 100.0f);\n        FCanvasTileItem HealthBack(FVector2D(Left, HealthY), FVector2D(Width, Height), FLinearColor(0.035f, 0.045f, 0.055f, 0.92f));\n        HealthBack.BlendMode = SE_BLEND_Translucent;\n        Canvas->DrawItem(HealthBack);\n        const FLinearColor HealthColor = Health <= 25.0f ? FLinearColor(0.9f, 0.08f, 0.06f, 1.0f) : FLinearColor(0.75f, 0.18f, 0.16f, 1.0f);\n        FCanvasTileItem HealthFill(FVector2D(Left, HealthY), FVector2D(Width * Health / 100.0f, Height), HealthColor);\n        HealthFill.BlendMode = SE_BLEND_Translucent;\n        Canvas->DrawItem(HealthFill);\n        DrawLabel(FString::Printf(TEXT("HEALTH  %3.0f%%"), Health), Left, HealthY + Height + 5.0f * Scale, Health <= 25.0f ? FLinearColor(1.0f, 0.25f, 0.2f, 1.0f) : FLinearColor::White);
+        DrawLabel(FString::Printf(TEXT("SPARE BATTERIES  x%d  (R)"), Character->GetBatteryPackCount()), Left, BarY + Height + 29.0f * Scale, FLinearColor::White);
+
+        const float HealthY = BarY + Height + 53.0f * Scale;
+        const float Health = FMath::Clamp(Character->GetHealthPercent(), 0.0f, 100.0f);
+        FCanvasTileItem HealthBack(FVector2D(Left, HealthY), FVector2D(Width, Height), FLinearColor(0.035f, 0.045f, 0.055f, 0.92f));
+        HealthBack.BlendMode = SE_BLEND_Translucent;
+        Canvas->DrawItem(HealthBack);
+        const FLinearColor HealthColor = Health <= 25.0f ? FLinearColor(0.9f, 0.08f, 0.06f, 1.0f) : FLinearColor(0.75f, 0.18f, 0.16f, 1.0f);
+        FCanvasTileItem HealthFill(FVector2D(Left, HealthY), FVector2D(Width * Health / 100.0f, Height), HealthColor);
+        HealthFill.BlendMode = SE_BLEND_Translucent;
+        Canvas->DrawItem(HealthFill);
+        DrawLabel(FString::Printf(TEXT("HEALTH  %3.0f%%"), Health), Left, HealthY + Height + 5.0f * Scale, Health <= 25.0f ? FLinearColor(1.0f, 0.25f, 0.2f, 1.0f) : FLinearColor::White);
     }
 
     if (Mode)
