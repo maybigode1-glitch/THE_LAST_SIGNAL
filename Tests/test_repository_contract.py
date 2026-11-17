@@ -72,6 +72,8 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertIn("ApplyAttackDamage", enemy)
         self.assertIn("AttackImpactTimer", enemy)
         self.assertIn("AttackRange + 75.0f", enemy)
+        self.assertIn("GreyboxVisual", enemy)
+        self.assertIn("BasicShapes/Cube.Cube", enemy)
     def test_stalker_audio_cues_are_configurable_and_triggered(self):
         header = (ROOT / "Source/TheLastSignal/Public/SignalStalker.h").read_text(encoding="utf-8")
         source = (ROOT / "Source/TheLastSignal/Private/SignalStalker.cpp").read_text(encoding="utf-8")
