@@ -8,6 +8,7 @@
 - Blueprintable `ASignalBatteryPickup` actor. Set `PacksGranted` in a child Blueprint to change the pickup amount.
 - Signal objectives: each successfully activated standard `ASignalInteractable` increments progress in `ALastSignalGameMode`. The default objective is 3 signals; `RequiredSignals` is configurable in a GameMode Blueprint.
 - Blueprint-readable getters expose flashlight charge, inventory count, and objective progress/completion.
+- Native C++ survival HUD (`ALastSignalHUD`) draws flashlight percentage and state, spare battery count, signal objective progress, completion state, and a small center reticle. It is assigned by default in `ALastSignalGameMode`.
 
 ## Input
 | Key | Action |
@@ -25,7 +26,7 @@
 4. Create a child Blueprint of `ASignalInteractable` for a signal objective; assign a visible Static Mesh that blocks Visibility.
 5. Create a child Blueprint of `ASignalBatteryPickup`; assign a battery-shaped mesh that blocks Visibility. Place several in the level.
 6. Optionally create a child GameMode Blueprint and set the required signal count.
-7. Set the map's GameMode override to `ALastSignalGameMode` or its Blueprint child, then test E/F/R.
+7. Set the map's GameMode override to `ALastSignalGameMode` or its Blueprint child, then test E/F/R. The HUD is registered automatically by this GameMode.
 
 ## Acceptance checklist
 - [ ] Project opens and C++ module compiles in UE 5.4.
@@ -33,7 +34,8 @@
 - [ ] E collects a battery pack once; the pickup disappears.
 - [ ] R consumes a pack only when flashlight charge is below 100%; charge increases by up to 35.
 - [ ] F toggles the light and charge drains while active.
+- [ ] HUD displays live flashlight charge, inventory count, and signal progress.
 - [ ] Activating each signal increments objective progress once; completion occurs at the configured target.
 
 ## Scope boundary
-These are source-code systems, not a finished level or playable release. No binary Unreal assets, map, HUD, audio, enemy AI, save system, packaging, or runtime QA are included yet.
+These are source-code systems, not a finished level or playable release. No binary Unreal assets, map, audio, enemy AI, save system, packaging, or runtime QA are included yet.
