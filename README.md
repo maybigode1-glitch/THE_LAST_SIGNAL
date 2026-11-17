@@ -14,6 +14,8 @@ First-person survival-horror prototype built with Unreal Engine 5.4.
 - `ASignalStalker` enemy: AIController-driven navigation, patrol around its spawn point, line-of-sight detection, player pursuit, last-known-position search, and timed melee attacks.
 - Player health (100 by default), damage feedback, and death state; movement/look and flashlight controls are disabled on death.
 - AI/navigation module dependencies are enabled in the runtime module.
+- `USignalStalkerAnimInstance` exposes locomotion/chase/search/attack state to Animation Blueprints; an editable attack montage can be triggered by the enemy.
+- Enemy audio hooks support footsteps, alert, attack, search, ambient loop, and chase loop sounds, all assignable in a child Blueprint.
 
 The repository does not yet contain binary Unreal assets or a playable map. Create the test map and Blueprint instances in Unreal Editor using [Docs/PROTOTYPE_SCOPE.md](Docs/PROTOTYPE_SCOPE.md).
 
