@@ -7,6 +7,7 @@ Establish a small first-person horror sandbox that can later host the opening se
 - First-person character with capsule collision and camera.
 - Keyboard movement (WASD) and mouse look.
 - E key interaction using a visibility-channel line trace.
+- F key flashlight attached to the camera, with a finite battery that drains while switched on and forces the light off at zero.
 - C++ interactable actor with a Blueprint-native interaction event.
 - GameMode selecting the first-person character.
 
