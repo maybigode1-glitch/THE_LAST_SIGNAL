@@ -71,7 +71,7 @@ def validate_repository(root: Path) -> list[str]:
     automation = root / "Scripts/create_relay_station_map.py"
     if automation.is_file():
         source = automation.read_text(encoding="utf-8")
-        for token in ("LVL_RelayStation01", "PlayerStart", "NavMeshBoundsVolume", "GameDefaultMap", "EditorStartupMap", "save_current_level", "SignalBatteryPickup", "SignalInteractable", "SignalStalker"):
+        for token in ("LVL_RelayStation01", "PlayerStart", "NavMeshBoundsVolume", "GameDefaultMap", "EditorStartupMap", "save_current_level", "RuntimeGeneration", "Dynamic", "SignalBatteryPickup", "SignalInteractable", "SignalStalker"):
             if token not in source:
                 errors.append(f"Scripts/create_relay_station_map.py missing expected element: {token}")
     hud_path = root / "Source/TheLastSignal/Private/LastSignalHUD.cpp"
