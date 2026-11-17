@@ -46,6 +46,15 @@ def validate_repository(root: Path) -> list[str]:
     project = root / "THE_LAST_SIGNAL.uproject"
     if project.is_file():
         errors.extend(validate_uproject(project))
+    input_config = root / "Config/DefaultInput.ini"
+    if input_config.is_file() and 'ActionName="Flashlight",Key=F' not in input_config.read_text(encoding="utf-8"):
+        errors.append("Flashlight action must be mapped to F in DefaultInput.ini")
+    character_source = root / "Source/TheLastSignal/Private/LastSignalCharacter.cpp"
+    if character_source.is_file():
+        source = character_source.read_text(encoding="utf-8")
+        for token in ("USpotLightComponent", "ToggleFlashlight", "FlashlightDrainPerSecond", "FlashlightBattery"):
+            if token not in source:
+                errors.append(f"Flashlight implementation missing expected element: {token}")
     return errors
 
 def main() -> int:
