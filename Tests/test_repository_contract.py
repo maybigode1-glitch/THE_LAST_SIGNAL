@@ -48,6 +48,21 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertIn("bIsDead", character)
         self.assertIn("GetHealthPercent", hud)
         self.assertIn("HEALTH", hud)
+    def test_stalker_animation_state_and_montage_hooks(self):
+        header = (ROOT / "Source/TheLastSignal/Public/SignalStalkerAnimInstance.h").read_text(encoding="utf-8")
+        source = (ROOT / "Source/TheLastSignal/Private/SignalStalkerAnimInstance.cpp").read_text(encoding="utf-8")
+        enemy = (ROOT / "Source/TheLastSignal/Private/SignalStalker.cpp").read_text(encoding="utf-8")
+        for token in ("GroundSpeed", "bIsChasing", "bIsSearching", "bIsAttacking"):
+            self.assertIn(token, header)
+            self.assertIn(token.replace("bIs", "Is"), source) if token != "GroundSpeed" else self.assertIn(token, source)
+        self.assertIn("Montage_Play", enemy)
+    def test_stalker_audio_cues_are_configurable_and_triggered(self):
+        header = (ROOT / "Source/TheLastSignal/Public/SignalStalker.h").read_text(encoding="utf-8")
+        source = (ROOT / "Source/TheLastSignal/Private/SignalStalker.cpp").read_text(encoding="utf-8")
+        for cue in ("FootstepSound", "AlertSound", "AttackSound", "SearchSound", "AmbientLoopSound", "ChaseLoopSound"):
+            self.assertIn(cue, header)
+            self.assertIn(cue, source)
+        self.assertIn("PlaySoundAtLocation", source)
     def test_missing_source_file_is_reported(self):
         import tempfile
         with tempfile.TemporaryDirectory() as tmp:
