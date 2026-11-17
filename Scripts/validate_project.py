@@ -6,6 +6,19 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+REQUIRED_FILES = (
+    "THE_LAST_SIGNAL.uproject",
+    "Config/DefaultEngine.ini",
+    "Config/DefaultInput.ini",
+    "Source/TheLastSignal/TheLastSignal.Build.cs",
+    "Source/TheLastSignal/Private/TheLastSignal.cpp",
+    "Source/TheLastSignal/Public/LastSignalCharacter.h",
+    "Source/TheLastSignal/Private/LastSignalCharacter.cpp",
+    "Source/TheLastSignal/Public/SignalInteractable.h",
+    "Source/TheLastSignal/Private/SignalInteractable.cpp",
+    "Source/TheLastSignal/Public/LastSignalGameMode.h",
+    "Source/TheLastSignal/Private/LastSignalGameMode.cpp",
+)
 
 def validate_uproject(path: Path) -> list[str]:
     try:
@@ -14,30 +27,36 @@ def validate_uproject(path: Path) -> list[str]:
         return [f"Invalid .uproject JSON: {exc}"]
     errors: list[str] = []
     if not isinstance(data, dict):
-        errors.append(".uproject root must be a JSON object")
-    elif "EngineAssociation" not in data:
-        errors.append("Missing EngineAssociation in .uproject")
-    elif not isinstance(data["EngineAssociation"], (str, int)):
+        return [".uproject root must be a JSON object"]
+    if not isinstance(data.get("EngineAssociation"), (str, int)):
         errors.append("EngineAssociation must be a string or number")
+    modules = data.get("Modules")
+    if not isinstance(modules, list) or not any(
+        isinstance(module, dict) and module.get("Name") == "TheLastSignal"
+        for module in modules
+    ):
+        errors.append("Modules must declare the TheLastSignal runtime module")
+    return errors
+
+def validate_repository(root: Path) -> list[str]:
+    errors: list[str] = []
+    for relative in REQUIRED_FILES:
+        if not (root / relative).is_file():
+            errors.append(f"Required project file missing: {relative}")
+    project = root / "THE_LAST_SIGNAL.uproject"
+    if project.is_file():
+        errors.extend(validate_uproject(project))
     return errors
 
 def main() -> int:
-    errors: list[str] = []
-    projects = sorted(ROOT.glob("*.uproject"))
-    if not projects:
-        print("INFO: no .uproject file found at repository root (scaffold may be incomplete)")
-    for project in projects:
-        errors.extend(f"{project.name}: {e}" for e in validate_uproject(project))
-    for directory in ("Config", "Source", "Docs", "Scripts", "Tests"):
-        if not (ROOT / directory).is_dir():
-            print(f"WARNING: expected directory missing: {directory}")
+    errors = validate_repository(ROOT)
     if errors:
         print("VALIDATION FAILED")
         for error in errors:
             print(f" - {error}")
         return 1
-    print(f"VALIDATION PASSED: {len(projects)} .uproject file(s) checked")
-    print("Scope: repository metadata only; no Unreal build or runtime test was performed.")
+    print("VALIDATION PASSED: project descriptor, module declaration, config, and core source files found.")
+    print("Scope: repository structure and metadata only; no Unreal build or runtime test was performed.")
     return 0
 
 if __name__ == "__main__":
