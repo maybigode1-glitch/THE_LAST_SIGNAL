@@ -89,6 +89,11 @@ class RepositoryContractTests(unittest.TestCase):
             self.assertIn(token, header + source)
         for token in ("Relay Terminal A", "Relay Terminal B", "Primary Signal Uplink", "Battery Pack", "NavMeshBoundsVolume"):
             self.assertIn(token, source + guide)
+    def test_editor_qa_script_checks_required_relay_station_actors(self):
+        source = (ROOT / "Scripts/qa_relay_station.py").read_text(encoding="utf-8")
+        for token in ("get_editor_world", "PlayerStart", "NavMeshBoundsVolume", "SignalInteractable", "SignalBatteryPickup", "SignalStalker", "RelayStation01_QA.json", "all(checks.values())"):
+            self.assertIn(token, source)
+
     def test_missing_source_file_is_reported(self):
         import tempfile
         with tempfile.TemporaryDirectory() as tmp:
