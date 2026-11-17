@@ -1,31 +1,39 @@
-# Prototype 0.1 — The Awakening
+# Prototype — The Awakening
 
-## Goal
-Establish a small first-person horror sandbox that can later host the opening sequence.
+## Implemented in C++ source
+- First-person character, camera, WASD movement, and mouse look.
+- E interaction using a Visibility-channel line trace.
+- F flashlight with finite charge; it drains while switched on and turns off at zero.
+- Battery-pack inventory: interact with a battery pickup using E; press R to consume one pack and restore up to 35 percentage points of flashlight charge.
+- Blueprintable `ASignalBatteryPickup` actor. Set `PacksGranted` in a child Blueprint to change the pickup amount.
+- Signal objectives: each successfully activated standard `ASignalInteractable` increments progress in `ALastSignalGameMode`. The default objective is 3 signals; `RequiredSignals` is configurable in a GameMode Blueprint.
+- Blueprint-readable getters expose flashlight charge, inventory count, and objective progress/completion.
 
-## Implemented in source
-- First-person character with capsule collision and camera.
-- Keyboard movement (WASD) and mouse look.
-- E key interaction using a visibility-channel line trace.
-- F key flashlight attached to the camera, with a finite battery that drains while switched on and forces the light off at zero.
-- C++ interactable actor with a Blueprint-native interaction event.
-- GameMode selecting the first-person character.
+## Input
+| Key | Action |
+|---|---|
+| WASD | Move |
+| Mouse | Look |
+| E | Interact / collect |
+| F | Toggle flashlight |
+| R | Use one battery pack |
 
 ## Editor setup still required
-1. Open THE_LAST_SIGNAL.uproject with Unreal Engine 5.4 or a compatible 5.x installation.
-2. Allow Unreal to generate IDE project files and compile the TheLastSignal module.
-3. Create a level at Content/Maps/LVL_Prototype.
-4. Place a PlayerStart and a child Blueprint of ASignalInteractable.
-5. Assign a static mesh to the Blueprint Mesh component. Ensure it blocks Visibility.
-6. Set the new level as the editor startup map and test WASD, mouse look, and E interaction.
+1. Open `THE_LAST_SIGNAL.uproject` with Unreal Engine 5.4 or a compatible 5.x installation.
+2. Generate IDE project files and compile the TheLastSignal module.
+3. Create `Content/Maps/LVL_Prototype`, add a PlayerStart, and set it as the startup map.
+4. Create a child Blueprint of `ASignalInteractable` for a signal objective; assign a visible Static Mesh that blocks Visibility.
+5. Create a child Blueprint of `ASignalBatteryPickup`; assign a battery-shaped mesh that blocks Visibility. Place several in the level.
+6. Optionally create a child GameMode Blueprint and set the required signal count.
+7. Set the map's GameMode override to `ALastSignalGameMode` or its Blueprint child, then test E/F/R.
 
 ## Acceptance checklist
-- [ ] Project opens in Unreal Editor without module errors.
-- [ ] C++ module compiles on the target Unreal version.
-- [ ] Character spawns at PlayerStart.
-- [ ] WASD movement and mouse look work.
-- [ ] E triggers interaction only when looking at an interactable within range.
-- [ ] Blueprint override of Interact executes.
+- [ ] Project opens and C++ module compiles in UE 5.4.
+- [ ] Character spawns and movement/look work.
+- [ ] E collects a battery pack once; the pickup disappears.
+- [ ] R consumes a pack only when flashlight charge is below 100%; charge increases by up to 35.
+- [ ] F toggles the light and charge drains while active.
+- [ ] Activating each signal increments objective progress once; completion occurs at the configured target.
 
 ## Scope boundary
-This is a source-code prototype, not a finished level or playable release. No assets, lighting, sound, save system, enemy AI, menus, packaging, or runtime QA are included yet.
+These are source-code systems, not a finished level or playable release. No binary Unreal assets, map, HUD, audio, enemy AI, save system, packaging, or runtime QA are included yet.
