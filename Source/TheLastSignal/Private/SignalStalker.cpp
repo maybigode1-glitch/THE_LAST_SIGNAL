@@ -1,6 +1,7 @@
 #include "SignalStalker.h"
 #include "LastSignalCharacter.h"
 #include "AIController.h"
+#include "Navigation/PathFollowingComponent.h"
 #include "NavigationSystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/CharacterMovementComponent.h"
