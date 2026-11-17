@@ -64,6 +64,7 @@ protected:
 private:
     void UpdateBehaviour();
     void PerformAttack();
+    void ApplyAttackDamage();
     void SetChasingState(bool bNewChasing);
     void SetSearchingState(bool bNewSearching);
     void UpdateLoopAudio();
@@ -86,4 +87,5 @@ private:
     bool bIsAttacking = false;
     bool bIsDead = false;
     FTimerHandle AttackStateTimer;
+    FTimerHandle AttackImpactTimer;
 };
