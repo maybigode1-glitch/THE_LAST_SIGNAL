@@ -19,7 +19,7 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertTrue(plugins["EditorScriptingUtilities"])
     def test_editor_map_script_creates_and_configures_level(self):
         source = (ROOT / "Scripts/create_relay_station_map.py").read_text(encoding="utf-8")
-        for token in ("LVL_RelayStation01", "PlayerStart", "NavMeshBoundsVolume", "GameDefaultMap", "EditorStartupMap", "save_current_level", "SignalBatteryPickup", "SignalInteractable", "SignalStalker"):
+        for token in ("LVL_RelayStation01", "PlayerStart", "NavMeshBoundsVolume", "GameDefaultMap", "EditorStartupMap", "save_current_level", "RuntimeGeneration", "Dynamic", "SignalBatteryPickup", "SignalInteractable", "SignalStalker"):
             self.assertIn(token, source)
     def test_flashlight_and_inventory_input_bindings(self):
         config = (ROOT / "Config/DefaultInput.ini").read_text(encoding="utf-8")
