@@ -13,6 +13,8 @@
 - The stalker performs timed melee attacks inside its attack radius. Damage is applied through Unreal's damage system.
 - Player health starts at 100; reaching zero triggers the death state, disables movement/look and switches off the flashlight. Health is displayed in the HUD.
 - Stalker tuning is exposed to Blueprints: detection radius, attack range, attack interval, damage, patrol radius and movement speed (via CharacterMovement).
+- `USignalStalkerAnimInstance` exposes `GroundSpeed`, `bIsMoving`, `bIsChasing`, `bIsSearching`, `bIsAttacking` and `bIsDead` to an Animation Blueprint. The enemy can play an assigned `AttackMontage` when it attacks.
+- Configurable audio hooks are exposed for footsteps, alert, attack, search, ambient loop and chase loop. Footsteps are triggered by travelled distance; one-shot cues are played at the enemy location; the loop component switches between ambient and chase sounds.
 
 ## Input
 | Key | Action |
@@ -31,8 +33,10 @@
 5. Create a child Blueprint of `ASignalBatteryPickup`; assign a battery-shaped mesh that blocks Visibility. Place several in the level.
 6. Optionally create a child GameMode Blueprint and set the required signal count.
 7. Add a `NavMeshBoundsVolume` covering walkable floor space and build navigation (press P in the editor to inspect the green navigable area).
-8. Place one or more `ASignalStalker` actors inside the navigable area. Create a child Blueprint to assign a skeletal mesh, animation Blueprint, and optional sounds; the native class supplies AI behaviour but intentionally does not bundle copyrighted character assets.
-9. Set the map's GameMode override to `ALastSignalGameMode` or its Blueprint child, then test E/F/R and enemy behaviour. The HUD is registered automatically by this GameMode.
+8. Place one or more `ASignalStalker` actors inside the navigable area. Create a child Blueprint and assign a Skeletal Mesh with a skeleton.
+9. Create an Animation Blueprint whose parent class is `USignalStalkerAnimInstance`. Build a locomotion state machine using `GroundSpeed`/`bIsMoving`; use `bIsChasing` and `bIsSearching` to tune locomotion, and connect an attack state or slot to an attack animation. Assign this Animation Blueprint to the enemy mesh. Create an Animation Montage for the attack and assign it to `AttackMontage` on the enemy Blueprint.
+10. Import or create sound assets and assign them in the enemy Blueprint: short one-shots for `FootstepSound`, `AlertSound`, `AttackSound` and `SearchSound`; looping sounds for `AmbientLoopSound` and `ChaseLoopSound`. Enable looping on loop assets and configure attenuation/spatialisation on the sound assets.
+11. Set the map's GameMode override to `ALastSignalGameMode` or its Blueprint child, then test E/F/R and enemy behaviour. The HUD is registered automatically by this GameMode.
 
 ## Acceptance checklist
 - [ ] Project opens and C++ module compiles in UE 5.4.
@@ -44,4 +48,4 @@
 - [ ] Activating each signal increments objective progress once; completion occurs at the configured target.
 
 ## Scope boundary
-These are source-code systems, not a finished level or playable release. No binary Unreal assets, map, audio, enemy AI, save system, packaging, or runtime QA are included yet.
+These are source-code systems, not a finished level or playable release. No binary Unreal map, skeletal mesh, animation clips, montage, or audio recordings are bundled yet. The C++ animation/audio integration is present, but asset assignment and runtime QA remain pending.
