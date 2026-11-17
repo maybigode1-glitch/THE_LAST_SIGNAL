@@ -3,18 +3,32 @@
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SpotLightComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Engine/World.h"
+#include "Engine/Engine.h"
 
 ALastSignalCharacter::ALastSignalCharacter()
 {
-    PrimaryActorTick.bCanEverTick = false;
+    PrimaryActorTick.bCanEverTick = true;
     GetCapsuleComponent()->InitCapsuleSize(42.0f, 96.0f);
     bUseControllerRotationYaw = true;
+
     FirstPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
     FirstPersonCamera->SetupAttachment(GetCapsuleComponent());
     FirstPersonCamera->SetRelativeLocation(FVector(0.0f, 0.0f, 64.0f));
     FirstPersonCamera->bUsePawnControlRotation = true;
+
+    Flashlight = CreateDefaultSubobject<USpotLightComponent>(TEXT("Flashlight"));
+    Flashlight->SetupAttachment(FirstPersonCamera);
+    Flashlight->SetRelativeLocation(FVector(18.0f, 8.0f, -6.0f));
+    Flashlight->SetRelativeRotation(FRotator::ZeroRotator);
+    Flashlight->SetIntensity(8500.0f);
+    Flashlight->SetAttenuationRadius(1800.0f);
+    Flashlight->SetInnerConeAngle(18.0f);
+    Flashlight->SetOuterConeAngle(32.0f);
+    Flashlight->SetVisibility(false);
+
     GetCharacterMovement()->bOrientRotationToMovement = false;
     GetCharacterMovement()->MaxWalkSpeed = 260.0f;
     GetCharacterMovement()->BrakingDecelerationWalking = 1200.0f;
@@ -23,6 +37,24 @@ ALastSignalCharacter::ALastSignalCharacter()
 void ALastSignalCharacter::BeginPlay()
 {
     Super::BeginPlay();
+    FlashlightBattery = FMath::Clamp(FlashlightBattery, 0.0f, 100.0f);
+}
+
+void ALastSignalCharacter::Tick(float DeltaSeconds)
+{
+    Super::Tick(DeltaSeconds);
+    if (!bFlashlightOn) return;
+
+    FlashlightBattery = FMath::Max(0.0f, FlashlightBattery - FlashlightDrainPerSecond * DeltaSeconds);
+    if (FlashlightBattery <= 0.0f)
+    {
+        bFlashlightOn = false;
+        Flashlight->SetVisibility(false);
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Flashlight battery depleted"));
+        }
+    }
 }
 
 void ALastSignalCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -34,6 +66,7 @@ void ALastSignalCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
     PlayerInputComponent->BindAxis(TEXT("Turn"), this, &ALastSignalCharacter::Turn);
     PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &ALastSignalCharacter::LookUp);
     PlayerInputComponent->BindAction(TEXT("Interact"), IE_Pressed, this, &ALastSignalCharacter::TryInteract);
+    PlayerInputComponent->BindAction(TEXT("Flashlight"), IE_Pressed, this, &ALastSignalCharacter::ToggleFlashlight);
 }
 
 void ALastSignalCharacter::MoveForward(float Value)
@@ -46,6 +79,24 @@ void ALastSignalCharacter::MoveRight(float Value)
 }
 void ALastSignalCharacter::Turn(float Value) { AddControllerYawInput(Value); }
 void ALastSignalCharacter::LookUp(float Value) { AddControllerPitchInput(Value); }
+
+void ALastSignalCharacter::ToggleFlashlight()
+{
+    if (!Flashlight) return;
+    if (bFlashlightOn)
+    {
+        bFlashlightOn = false;
+        Flashlight->SetVisibility(false);
+        return;
+    }
+    if (FlashlightBattery <= 0.0f)
+    {
+        if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Red, TEXT("No flashlight battery"));
+        return;
+    }
+    bFlashlightOn = true;
+    Flashlight->SetVisibility(true);
+}
 
 void ALastSignalCharacter::TryInteract()
 {
