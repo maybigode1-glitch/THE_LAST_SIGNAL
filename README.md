@@ -2,35 +2,29 @@
 
 First-person survival-horror prototype built with Unreal Engine 5.4.
 
-## Current prototype
+## Current prototype source
+- First-person character, camera, WASD movement, and mouse look.
+- E interaction via Visibility-channel line trace.
+- F flashlight with a draining battery.
+- Battery-pack pickup actor: collect with E and store packs in the character inventory.
+- Press R to consume one pack and restore up to 35 percentage points of flashlight charge.
+- Signal objective counter in the GameMode; standard interactables count once toward the configurable target (default: 3).
+- Blueprint getters for flashlight charge, battery-pack count, and objective progress/completion.
 
-The repository now contains a minimal Unreal C++ project foundation:
-
-- First-person character and camera.
-- WASD movement and mouse look through legacy input mappings.
-- E-key interaction via a visibility-channel line trace.
-- Camera-mounted flashlight toggled with F, with a finite battery that drains while active.
-- Blueprintable signal-interactable actor with a Blueprint-native interaction event.
-- GameMode that spawns the prototype character.
-
-The initial prototype intentionally has no binary Unreal assets or level yet. Create the first test map and assign meshes in Unreal Editor as described in [Docs/PROTOTYPE_SCOPE.md](Docs/PROTOTYPE_SCOPE.md).
+The repository does not yet contain binary Unreal assets or a playable map. Create the test map and Blueprint instances in Unreal Editor using [Docs/PROTOTYPE_SCOPE.md](Docs/PROTOTYPE_SCOPE.md).
 
 ## Open in Unreal
-
 1. Install Unreal Engine 5.4 (or a compatible 5.x version).
 2. Open `THE_LAST_SIGNAL.uproject`.
 3. Allow Unreal to generate IDE project files and compile the C++ module.
 4. Follow the editor setup checklist in [Docs/PROTOTYPE_SCOPE.md](Docs/PROTOTYPE_SCOPE.md).
 
 ## Repository checks
-
 ```bash
 python Scripts/validate_project.py
 python -m unittest discover -s Tests -v
 ```
-
-GitHub Actions runs metadata, project-structure, and Python unit checks on pushes and pull requests.
+GitHub Actions runs repository-level validation and Python unit tests on pushes and pull requests.
 
 ## Honest test boundary
-
-A green CI run means repository-level checks passed. It does **not** mean the Unreal C++ module was compiled, the editor launched, gameplay was exercised, or a Windows build was produced. See [Docs/TEST_STATUS.md](Docs/TEST_STATUS.md).
+Passing repository checks does not prove that Unreal C++ compiled, the editor launched, gameplay ran, or a Windows build was packaged. See [Docs/TEST_STATUS.md](Docs/TEST_STATUS.md).
