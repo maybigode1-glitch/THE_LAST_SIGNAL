@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SpotLightComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PlayerController.h"
 #include "Engine/World.h"
 #include "Engine/Engine.h"
 ALastSignalCharacter::ALastSignalCharacter()
@@ -33,6 +34,7 @@ void ALastSignalCharacter::BeginPlay()
 {
     Super::BeginPlay();
     FlashlightBattery = FMath::Clamp(FlashlightBattery, 0.0f, 100.0f);
+    Health = FMath::Clamp(MaxHealth, 1.0f, 100.0f);
 }
 void ALastSignalCharacter::Tick(float DeltaSeconds)
 {
@@ -46,6 +48,30 @@ void ALastSignalCharacter::Tick(float DeltaSeconds)
         if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, TEXT("Flashlight battery depleted"));
     }
 }
+float ALastSignalCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+    const float AppliedDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+    if (bIsDead || AppliedDamage <= 0.0f) return 0.0f;
+    Health = FMath::Max(0.0f, Health - AppliedDamage);
+    if (Health <= 0.0f)
+    {
+        bIsDead = true;
+        bFlashlightOn = false;
+        if (Flashlight) Flashlight->SetVisibility(false);
+        GetCharacterMovement()->DisableMovement();
+        if (APlayerController* PC = Cast<APlayerController>(GetController()))
+        {
+            PC->SetIgnoreMoveInput(true);
+            PC->SetIgnoreLookInput(true);
+        }
+        if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 10.0f, FColor::Red, TEXT("YOU DIED - THE SIGNAL IS LOST"));
+    }
+    else if (GEngine)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 1.2f, FColor::Red, FString::Printf(TEXT("INJURED  |  HEALTH %.0f%%"), Health));
+    }
+    return AppliedDamage;
+}
 void ALastSignalCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
     Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -58,13 +84,13 @@ void ALastSignalCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
     PlayerInputComponent->BindAction(TEXT("Flashlight"), IE_Pressed, this, &ALastSignalCharacter::ToggleFlashlight);
     PlayerInputComponent->BindAction(TEXT("UseBattery"), IE_Pressed, this, &ALastSignalCharacter::UseBatteryPack);
 }
-void ALastSignalCharacter::MoveForward(float Value) { if (Controller && FMath::Abs(Value) > KINDA_SMALL_NUMBER) AddMovementInput(GetActorForwardVector(), Value); }
-void ALastSignalCharacter::MoveRight(float Value) { if (Controller && FMath::Abs(Value) > KINDA_SMALL_NUMBER) AddMovementInput(GetActorRightVector(), Value); }
-void ALastSignalCharacter::Turn(float Value) { AddControllerYawInput(Value); }
-void ALastSignalCharacter::LookUp(float Value) { AddControllerPitchInput(Value); }
+void ALastSignalCharacter::MoveForward(float Value) { if (!bIsDead && Controller && FMath::Abs(Value) > KINDA_SMALL_NUMBER) AddMovementInput(GetActorForwardVector(), Value); }
+void ALastSignalCharacter::MoveRight(float Value) { if (!bIsDead && Controller && FMath::Abs(Value) > KINDA_SMALL_NUMBER) AddMovementInput(GetActorRightVector(), Value); }
+void ALastSignalCharacter::Turn(float Value) { if (!bIsDead) AddControllerYawInput(Value); }
+void ALastSignalCharacter::LookUp(float Value) { if (!bIsDead) AddControllerPitchInput(Value); }
 void ALastSignalCharacter::ToggleFlashlight()
 {
-    if (!Flashlight) return;
+    if (!Flashlight || bIsDead) return;
     if (bFlashlightOn) { bFlashlightOn = false; Flashlight->SetVisibility(false); return; }
     if (FlashlightBattery <= 0.0f)
     {
@@ -76,12 +102,13 @@ void ALastSignalCharacter::ToggleFlashlight()
 }
 void ALastSignalCharacter::AddBatteryPack(int32 Amount)
 {
-    if (Amount <= 0) return;
+    if (Amount <= 0 || bIsDead) return;
     BatteryPacks = FMath::Clamp(BatteryPacks + Amount, 0, 99);
     if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Battery pack collected | Inventory: %d"), BatteryPacks));
 }
 void ALastSignalCharacter::UseBatteryPack()
 {
+    if (bIsDead) return;
     if (BatteryPacks <= 0 || FlashlightBattery >= 100.0f)
     {
         if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, BatteryPacks <= 0 ? TEXT("No spare battery packs") : TEXT("Flashlight is already full"));
@@ -91,10 +118,9 @@ void ALastSignalCharacter::UseBatteryPack()
     FlashlightBattery = FMath::Min(100.0f, FlashlightBattery + BatteryPackCharge);
     if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Flashlight recharged: %.0f%% | Packs: %d"), FlashlightBattery, BatteryPacks));
 }
-
 void ALastSignalCharacter::TryInteract()
 {
-    if (!Controller || !GetWorld() || !FirstPersonCamera) return;
+    if (bIsDead || !Controller || !GetWorld() || !FirstPersonCamera) return;
     const FVector Start = FirstPersonCamera->GetComponentLocation();
     const FVector End = Start + FirstPersonCamera->GetForwardVector() * InteractionDistance;
     FCollisionQueryParams QueryParams(SCENE_QUERY_STAT(LastSignalInteraction), false, this);
