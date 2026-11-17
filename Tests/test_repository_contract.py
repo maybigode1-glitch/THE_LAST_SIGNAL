@@ -36,6 +36,7 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertIn("GetSignalsCollected", hud)
         self.assertIn("GetRequiredSignals", hud)
         self.assertIn("ALastSignalHUD::StaticClass", mode)
+        self.assertNotIn("\\n        const float HealthY", hud)
     def test_stalker_ai_has_patrol_chase_search_and_attack(self):
         source = (ROOT / "Source/TheLastSignal/Private/SignalStalker.cpp").read_text(encoding="utf-8")
         for token in ("LineOfSightTo", "MoveToActor", "MoveToLocation", "PerformAttack", "GetRandomReachablePointInRadius"):
@@ -64,6 +65,14 @@ class RepositoryContractTests(unittest.TestCase):
             self.assertIn(cue, header)
             self.assertIn(cue, source)
         self.assertIn("PlaySoundAtLocation", source)
+    def test_first_area_builder_creates_route_objectives_pickups_and_enemy(self):
+        header = (ROOT / "Source/TheLastSignal/Public/SignalPrototypeArea.h").read_text(encoding="utf-8")
+        source = (ROOT / "Source/TheLastSignal/Private/SignalPrototypeArea.cpp").read_text(encoding="utf-8")
+        guide = (ROOT / "Docs/FIRST_PLAYABLE_AREA.md").read_text(encoding="utf-8")
+        for token in ("BuildGeometry", "SpawnObjectivesAndPickups", "SpawnStalker", "bSpawnStalker", "bSpawnPickups"):
+            self.assertIn(token, header + source)
+        for token in ("Relay Terminal A", "Relay Terminal B", "Primary Signal Uplink", "Battery Pack", "NavMeshBoundsVolume"):
+            self.assertIn(token, source + guide)
     def test_missing_source_file_is_reported(self):
         import tempfile
         with tempfile.TemporaryDirectory() as tmp:
