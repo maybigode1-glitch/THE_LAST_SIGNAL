@@ -17,7 +17,7 @@ First-person survival-horror prototype built with Unreal Engine 5.4.
 - `USignalStalkerAnimInstance` exposes locomotion/chase/search/attack state to Animation Blueprints; an editable attack montage can be triggered by the enemy.
 - Enemy audio hooks support footsteps, alert, attack, search, ambient loop, and chase loop sounds, all assignable in a child Blueprint.
 
-The repository does not yet contain binary Unreal assets or a playable map. Create the test map and Blueprint instances in Unreal Editor using [Docs/PROTOTYPE_SCOPE.md](Docs/PROTOTYPE_SCOPE.md).
+The repository does not yet contain binary Unreal assets or a playable map. Create the test map and Blueprint instances in Unreal Editor using [Docs/PROTOTYPE_SCOPE.md](Docs/PROTOTYPE_SCOPE.md). For enemy mesh, Animation Blueprint, montage and sound assignment, follow [Docs/STALKER_ANIMATION_AUDIO_SETUP.md](Docs/STALKER_ANIMATION_AUDIO_SETUP.md).
 
 ## Open in Unreal
 1. Install Unreal Engine 5.4 (or a compatible 5.x version).
