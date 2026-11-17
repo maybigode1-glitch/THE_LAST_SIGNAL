@@ -9,21 +9,21 @@ First-person survival-horror prototype built with Unreal Engine 5.4.
 - Battery-pack pickup actor: collect with E and store packs in the character inventory.
 - Press R to consume one pack and restore up to 35 percentage points of flashlight charge.
 - Signal objective counter in the GameMode; standard interactables count once toward the configurable target (default: 3).
-- Blueprint getters for flashlight charge, battery-pack count, and objective progress/completion.
 - Native C++ survival HUD showing flashlight charge/state, spare battery inventory, player health, signal objective progress/completion, and a center reticle.
-- `ASignalStalker` enemy: AIController-driven navigation, patrol around its spawn point, line-of-sight detection, player pursuit, last-known-position search, and timed melee attacks.
-- Player health (100 by default), damage feedback, and death state; movement/look and flashlight controls are disabled on death.
-- AI/navigation module dependencies are enabled in the runtime module.
-- `USignalStalkerAnimInstance` exposes locomotion/chase/search/attack state to Animation Blueprints; an editable attack montage can be triggered by the enemy.
-- Enemy audio hooks support footsteps, alert, attack, search, ambient loop, and chase loop sounds, all assignable in a child Blueprint.
+- `ASignalStalker` enemy: navigation patrol, line-of-sight detection, pursuit, last-known-position search, and timed melee attacks.
+- `USignalStalkerAnimInstance` exposes locomotion/chase/search/attack state; montage and six enemy audio hooks are configurable.
+- `ASignalPrototypeArea` builds the first industrial relay-station greybox at runtime: collision floor/walls, partitions, cover, three signal terminals, two battery pickups, and a temporary stalker silhouette.
 
-The repository does not yet contain binary Unreal assets or a playable map. Create the test map and Blueprint instances in Unreal Editor using [Docs/PROTOTYPE_SCOPE.md](Docs/PROTOTYPE_SCOPE.md). For enemy mesh, Animation Blueprint, montage and sound assignment, follow [Docs/STALKER_ANIMATION_AUDIO_SETUP.md](Docs/STALKER_ANIMATION_AUDIO_SETUP.md).
+## First area
+Follow [Docs/FIRST_PLAYABLE_AREA.md](Docs/FIRST_PLAYABLE_AREA.md) to create `LVL_RelayStation01`, place the area builder and PlayerStart, add a NavMeshBoundsVolume, and set the startup map. The builder uses Unreal's built-in cube mesh and needs no imported environment art.
+
+Enemy mesh, Animation Blueprint, montage, and sound assignment: [Docs/STALKER_ANIMATION_AUDIO_SETUP.md](Docs/STALKER_ANIMATION_AUDIO_SETUP.md).
 
 ## Open in Unreal
 1. Install Unreal Engine 5.4 (or a compatible 5.x version).
 2. Open `THE_LAST_SIGNAL.uproject`.
 3. Allow Unreal to generate IDE project files and compile the C++ module.
-4. Follow the editor setup checklist in [Docs/PROTOTYPE_SCOPE.md](Docs/PROTOTYPE_SCOPE.md).
+4. Follow [Docs/FIRST_PLAYABLE_AREA.md](Docs/FIRST_PLAYABLE_AREA.md).
 
 ## Repository checks
 ```bash
@@ -33,4 +33,4 @@ python -m unittest discover -s Tests -v
 GitHub Actions runs repository-level validation and Python unit tests on pushes and pull requests.
 
 ## Honest test boundary
-Passing repository checks does not prove that Unreal C++ compiled, the editor launched, gameplay ran, or a Windows build was packaged. See [Docs/TEST_STATUS.md](Docs/TEST_STATUS.md).
+The area builder is source code, not a binary `.umap`. No Unreal compilation, editor launch, runtime playtest, or Windows packaging is claimed until verified. See [Docs/TEST_STATUS.md](Docs/TEST_STATUS.md).
