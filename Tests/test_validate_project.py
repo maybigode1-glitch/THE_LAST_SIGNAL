@@ -14,7 +14,7 @@ class ValidateProjectTests(unittest.TestCase):
     def test_valid_project_metadata(self):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / "sample.uproject"
-            path.write_text(json.dumps({"EngineAssociation": "5.4", "Modules": []}), encoding="utf-8")
+            path.write_text(json.dumps({"EngineAssociation": "5.4", "Modules": [{"Name": "TheLastSignal", "Type": "Runtime"}]}), encoding="utf-8")
             self.assertEqual(MODULE.validate_uproject(path), [])
 
     def test_missing_engine_association_is_reported(self):
