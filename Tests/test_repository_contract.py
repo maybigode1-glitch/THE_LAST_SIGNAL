@@ -1,4 +1,5 @@
 import importlib.util
+import json
 import unittest
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
@@ -10,8 +11,16 @@ SPEC.loader.exec_module(MODULE)
 class RepositoryContractTests(unittest.TestCase):
     def test_required_ue5_files_exist(self):
         self.assertEqual(MODULE.validate_repository(ROOT), [])
-    def test_project_declares_runtime_module(self):
+    def test_project_declares_runtime_module_and_editor_automation_plugins(self):
+        project = json.loads((ROOT / "THE_LAST_SIGNAL.uproject").read_text(encoding="utf-8"))
         self.assertEqual(MODULE.validate_uproject(ROOT / "THE_LAST_SIGNAL.uproject"), [])
+        plugins = {p["Name"]: p["Enabled"] for p in project["Plugins"]}
+        self.assertTrue(plugins["PythonScriptPlugin"])
+        self.assertTrue(plugins["EditorScriptingUtilities"])
+    def test_editor_map_script_creates_and_configures_level(self):
+        source = (ROOT / "Scripts/create_relay_station_map.py").read_text(encoding="utf-8")
+        for token in ("LVL_RelayStation01", "PlayerStart", "NavMeshBoundsVolume", "GameDefaultMap", "EditorStartupMap", "save_current_level", "SignalBatteryPickup", "SignalInteractable", "SignalStalker"):
+            self.assertIn(token, source)
     def test_flashlight_and_inventory_input_bindings(self):
         config = (ROOT / "Config/DefaultInput.ini").read_text(encoding="utf-8")
         source = (ROOT / "Source/TheLastSignal/Private/LastSignalCharacter.cpp").read_text(encoding="utf-8")
@@ -78,7 +87,7 @@ class RepositoryContractTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / "THE_LAST_SIGNAL.uproject").write_text(
-                '{"EngineAssociation":"5.4","Modules":[{"Name":"TheLastSignal"}]}', encoding="utf-8")
+                '{"EngineAssociation":"5.4","Modules":[{"Name":"TheLastSignal"}],"Plugins":[{"Name":"PythonScriptPlugin","Enabled":true},{"Name":"EditorScriptingUtilities","Enabled":true}]}', encoding="utf-8")
             errors = MODULE.validate_repository(root)
             self.assertTrue(any("LastSignalCharacter.cpp" in error for error in errors))
 if __name__ == "__main__":
