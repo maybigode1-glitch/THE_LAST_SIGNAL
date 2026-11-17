@@ -15,6 +15,8 @@ REQUIRED_FILES = (
     "Source/TheLastSignal/Public/LastSignalHUD.h", "Source/TheLastSignal/Private/LastSignalHUD.cpp",
     "Source/TheLastSignal/Public/SignalStalker.h", "Source/TheLastSignal/Private/SignalStalker.cpp",
     "Source/TheLastSignal/Public/SignalStalkerAnimInstance.h", "Source/TheLastSignal/Private/SignalStalkerAnimInstance.cpp",
+    "Source/TheLastSignal/Public/SignalPrototypeArea.h", "Source/TheLastSignal/Private/SignalPrototypeArea.cpp",
+    "Docs/FIRST_PLAYABLE_AREA.md",
 )
 def validate_uproject(path: Path) -> list[str]:
     try:
@@ -48,12 +50,11 @@ def validate_repository(root: Path) -> list[str]:
         "Source/TheLastSignal/Private/LastSignalCharacter.cpp": ("USpotLightComponent", "ToggleFlashlight", "FlashlightDrainPerSecond", "AddBatteryPack", "UseBatteryPack"),
         "Source/TheLastSignal/Private/SignalBatteryPickup.cpp": ("ASignalBatteryPickup", "AddBatteryPack", "Destroy()"),
         "Source/TheLastSignal/Private/LastSignalGameMode.cpp": ("RegisterSignalCollected", "AreObjectivesComplete", "ALastSignalHUD::StaticClass"),
-        "Source/TheLastSignal/Private/LastSignalHUD.cpp": ("GetFlashlightBatteryPercent", "GetBatteryPackCount", "GetSignalsCollected", "GetRequiredSignals", "DrawHUD", "FLASHLIGHT", "SPARE BATTERIES"),
+        "Source/TheLastSignal/Private/LastSignalHUD.cpp": ("GetFlashlightBatteryPercent", "GetBatteryPackCount", "GetSignalsCollected", "GetRequiredSignals", "DrawHUD", "FLASHLIGHT", "SPARE BATTERIES", "GetHealthPercent"),
         "Source/TheLastSignal/Private/SignalInteractable.cpp": ("RegisterSignalCollected", "bHasBeenActivated"),
         "Source/TheLastSignal/Private/SignalStalker.cpp": ("AAIController", "LineOfSightTo", "MoveToActor", "MoveToLocation", "PerformAttack", "TakeDamage", "GetRandomReachablePointInRadius", "FootstepSound", "AlertSound", "AttackSound", "SearchSound", "AmbientLoopSound", "ChaseLoopSound", "Montage_Play", "bIsAttacking"),
         "Source/TheLastSignal/Private/SignalStalkerAnimInstance.cpp": ("NativeUpdateAnimation", "GroundSpeed", "IsChasing", "IsSearching", "IsAttacking"),
-        "Source/TheLastSignal/Private/LastSignalCharacter.cpp": ("USpotLightComponent", "ToggleFlashlight", "FlashlightDrainPerSecond", "AddBatteryPack", "UseBatteryPack", "TakeDamage", "Health", "bIsDead", "YOU DIED"),
-        "Source/TheLastSignal/Private/LastSignalHUD.cpp": ("GetHealthPercent", "HEALTH"),
+        "Source/TheLastSignal/Private/SignalPrototypeArea.cpp": ("BuildGeometry", "SpawnObjectivesAndPickups", "SpawnStalker", "ASignalBatteryPickup", "ASignalInteractable", "ASignalStalker", "BasicShapes/Cube.Cube"),
     }
     for relative, tokens in checks.items():
         path = root / relative
@@ -62,6 +63,9 @@ def validate_repository(root: Path) -> list[str]:
             for token in tokens:
                 if token not in source:
                     errors.append(f"{relative} missing expected element: {token}")
+    hud_path = root / "Source/TheLastSignal/Private/LastSignalHUD.cpp"
+    if hud_path.is_file() and "\\n        const float HealthY" in hud_path.read_text(encoding="utf-8"):
+        errors.append("LastSignalHUD.cpp contains literal escaped newlines in the health HUD block")
     return errors
 def main() -> int:
     errors = validate_repository(ROOT)
@@ -70,7 +74,7 @@ def main() -> int:
         for error in errors:
             print(f" - {error}")
         return 1
-    print("VALIDATION PASSED: project metadata, required source files, inventory, pickups, objectives, HUD, enemy AI, animation hooks, audio hooks, health, and input mappings.")
+    print("VALIDATION PASSED: UE metadata, first-area builder, objectives, pickups, HUD, enemy AI, animation/audio hooks, and input mappings.")
     print("Scope: static repository checks only; no Unreal build or runtime test was performed.")
     return 0
 if __name__ == "__main__":
