@@ -14,6 +14,16 @@ import unreal
 EXPECTED_MAP = "/Game/Maps/LVL_RelayStation01"
 REPORT_NAME = "RelayStation01_QA.json"
 GENERATED_PREFIX = "RS01_AUTO_"
+REQUIRED_GENERATED_LABELS = {
+    "RS01_AUTO_PlayerStart_WestEntrance",
+    "RS01_AUTO_NavMeshBounds_RelayStation",
+    "RS01_AUTO_TerminalA",
+    "RS01_AUTO_TerminalB",
+    "RS01_AUTO_PrimaryUplink",
+    "RS01_AUTO_BatteryA",
+    "RS01_AUTO_BatteryB",
+    "RS01_AUTO_Stalker_AI_NoAssignedMesh",
+}
 
 
 def log(message):
@@ -40,6 +50,10 @@ def run_qa():
         except Exception:
             pass
 
+    generated_label_set = set(generated_labels)
+    missing_generated_labels = sorted(
+        REQUIRED_GENERATED_LABELS - generated_label_set
+    )
     checks = {
         "correct_map_open": package == EXPECTED_MAP,
         "player_start": counts.get("PlayerStart", 0) >= 1,
@@ -47,6 +61,7 @@ def run_qa():
         "three_signal_terminals": counts.get("SignalInteractable", 0) >= 3,
         "two_battery_pickups": counts.get("SignalBatteryPickup", 0) >= 2,
         "stalker_ai": counts.get("SignalStalker", 0) >= 1,
+        "required_generated_actors": not missing_generated_labels,
     }
 
     report = {
@@ -55,6 +70,8 @@ def run_qa():
         "actor_count": len(actors),
         "class_counts": counts,
         "generated_actor_labels": sorted(generated_labels),
+        "required_generated_labels": sorted(REQUIRED_GENERATED_LABELS),
+        "missing_generated_labels": missing_generated_labels,
         "checks": checks,
         "passed": all(checks.values()),
         "scope": "Editor-world structural checks only; no gameplay, navmesh, build, or packaging test.",
@@ -68,6 +85,8 @@ def run_qa():
 
     for name, passed in checks.items():
         log(("PASS" if passed else "FAIL") + ": " + name)
+    if missing_generated_labels:
+        log("Missing generated actors: " + ", ".join(missing_generated_labels))
     log("Report: " + report_path)
 
     if not report["passed"]:
