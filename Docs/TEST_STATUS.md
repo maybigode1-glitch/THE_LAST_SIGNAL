@@ -18,11 +18,12 @@
 - [x] PythonScriptPlugin and EditorScriptingUtilities enabled in the project descriptor.
 - [x] First-area automation guide and repository validator/test coverage.
 - [x] Unreal Editor structural QA script for the generated Relay Station map, with a JSON report and explicit pass/fail checks.
-- [x] Offline unit tests for the Editor QA report logic: passing actor set, missing stalker, and wrong map.
+- [x] Offline unit tests for the Editor QA report logic: passing actor set, missing stalker, wrong map, and missing required generated labels.
+- [x] Offline QA regression tests for duplicate generated labels and required labels assigned to unexpected actor classes, including cases where aggregate class counts still match.
 - [x] Offline tests for the map builder INI helper: update existing keys while preserving unrelated settings, create a missing section, and repeat updates idempotently.
 
 ## Validation still pending
-- [x] Execute repository metadata validation and all 24 Python unit tests in GitHub Actions; latest run passed: [run 44301772716](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/actions/runs/44301772716).
+- [x] Execute repository metadata validation and the full Python unit-test suite in GitHub Actions; latest run passed: [run 44489478902](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/actions/runs/44489478902).
 - [ ] Run `Scripts/qa_relay_station.py` inside Unreal Editor after generating the map; inspect `Saved/RelayStation01_QA.json`.
 - [ ] Generate project files and compile with UnrealBuildTool on UE 5.4.
 - [ ] Run `Scripts/create_relay_station_map.py` inside Unreal Editor and verify that the `.umap` is saved.
@@ -33,4 +34,4 @@
 - [ ] Assign skeletal mesh, Animation Blueprint, attack montage, and audio assets; test in runtime.
 - [ ] Produce Windows packaged build and perform gameplay QA.
 
-The offline Editor-QA unit tests use a small Unreal Python API double to test the script's report/pass/fail logic; they do not execute Unreal Editor. The INI-helper tests use standard-library temporary files and do not execute Unreal Editor. Repository checks are static/Python checks only; they do not prove Unreal compilation, editor startup, map generation, runtime behavior, or packaging.
+The offline Editor-QA unit tests use a small Unreal Python API double to test the script's report/pass/fail logic; they do not execute Unreal Editor. They verify report generation, required labels, duplicate-label rejection, and required label-to-class mappings. The INI-helper tests use standard-library temporary files and do not execute Unreal Editor. Repository checks are static/Python checks only; they do not prove Unreal compilation, editor startup, map generation, runtime behavior, or packaging.
