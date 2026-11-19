@@ -14,16 +14,17 @@ import unreal
 EXPECTED_MAP = "/Game/Maps/LVL_RelayStation01"
 REPORT_NAME = "RelayStation01_QA.json"
 GENERATED_PREFIX = "RS01_AUTO_"
-REQUIRED_GENERATED_LABELS = {
-    "RS01_AUTO_PlayerStart_WestEntrance",
-    "RS01_AUTO_NavMeshBounds_RelayStation",
-    "RS01_AUTO_TerminalA",
-    "RS01_AUTO_TerminalB",
-    "RS01_AUTO_PrimaryUplink",
-    "RS01_AUTO_BatteryA",
-    "RS01_AUTO_BatteryB",
-    "RS01_AUTO_Stalker_AI_NoAssignedMesh",
+REQUIRED_GENERATED_ACTOR_CLASSES = {
+    "RS01_AUTO_PlayerStart_WestEntrance": "PlayerStart",
+    "RS01_AUTO_NavMeshBounds_RelayStation": "NavMeshBoundsVolume",
+    "RS01_AUTO_TerminalA": "SignalInteractable",
+    "RS01_AUTO_TerminalB": "SignalInteractable",
+    "RS01_AUTO_PrimaryUplink": "SignalInteractable",
+    "RS01_AUTO_BatteryA": "SignalBatteryPickup",
+    "RS01_AUTO_BatteryB": "SignalBatteryPickup",
+    "RS01_AUTO_Stalker_AI_NoAssignedMesh": "SignalStalker",
 }
+REQUIRED_GENERATED_LABELS = set(REQUIRED_GENERATED_ACTOR_CLASSES)
 
 
 def log(message):
@@ -38,7 +39,7 @@ def run_qa():
     package = world.get_outermost().get_name()
     actors = unreal.EditorLevelLibrary.get_all_level_actors()
     counts = {}
-    generated_labels = []
+    generated_actor_classes = {}
 
     for actor in actors:
         class_name = actor.get_class().get_name()
@@ -46,14 +47,36 @@ def run_qa():
         try:
             label = actor.get_actor_label()
             if label.startswith(GENERATED_PREFIX):
-                generated_labels.append(label)
+                generated_actor_classes.setdefault(label, []).append(class_name)
         except Exception:
             pass
 
-    generated_label_set = set(generated_labels)
+    generated_labels = sorted(
+        label
+        for label, class_names in generated_actor_classes.items()
+        for _ in class_names
+    )
+    generated_label_set = set(generated_actor_classes)
     missing_generated_labels = sorted(
         REQUIRED_GENERATED_LABELS - generated_label_set
     )
+    duplicate_generated_labels = sorted(
+        label
+        for label, class_names in generated_actor_classes.items()
+        if len(class_names) > 1
+    )
+    wrong_generated_actor_classes = {
+        label: {
+            "expected": expected_class,
+            "actual": sorted(set(generated_actor_classes.get(label, []))),
+        }
+        for label, expected_class in REQUIRED_GENERATED_ACTOR_CLASSES.items()
+        if label in generated_actor_classes
+        and any(
+            class_name != expected_class
+            for class_name in generated_actor_classes[label]
+        )
+    }
     checks = {
         "correct_map_open": package == EXPECTED_MAP,
         "player_start": counts.get("PlayerStart", 0) >= 1,
@@ -62,6 +85,8 @@ def run_qa():
         "two_battery_pickups": counts.get("SignalBatteryPickup", 0) >= 2,
         "stalker_ai": counts.get("SignalStalker", 0) >= 1,
         "required_generated_actors": not missing_generated_labels,
+        "unique_generated_actor_labels": not duplicate_generated_labels,
+        "required_generated_actor_classes": not wrong_generated_actor_classes,
     }
 
     report = {
@@ -69,9 +94,15 @@ def run_qa():
         "expected_map": EXPECTED_MAP,
         "actor_count": len(actors),
         "class_counts": counts,
-        "generated_actor_labels": sorted(generated_labels),
+        "generated_actor_labels": generated_labels,
+        "generated_actor_classes": {
+            label: sorted(class_names)
+            for label, class_names in sorted(generated_actor_classes.items())
+        },
         "required_generated_labels": sorted(REQUIRED_GENERATED_LABELS),
         "missing_generated_labels": missing_generated_labels,
+        "duplicate_generated_labels": duplicate_generated_labels,
+        "wrong_generated_actor_classes": wrong_generated_actor_classes,
         "checks": checks,
         "passed": all(checks.values()),
         "scope": "Editor-world structural checks only; no gameplay, navmesh, build, or packaging test.",
@@ -87,6 +118,12 @@ def run_qa():
         log(("PASS" if passed else "FAIL") + ": " + name)
     if missing_generated_labels:
         log("Missing generated actors: " + ", ".join(missing_generated_labels))
+    if duplicate_generated_labels:
+        log("Duplicate generated actor labels: " + ", ".join(duplicate_generated_labels))
+    if wrong_generated_actor_classes:
+        log("Generated actors with unexpected classes: " + json.dumps(
+            wrong_generated_actor_classes, sort_keys=True
+        ))
     log("Report: " + report_path)
 
     if not report["passed"]:
