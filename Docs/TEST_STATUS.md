@@ -23,7 +23,7 @@
 - [x] Offline tests for the map builder INI helper: update existing keys while preserving unrelated settings, create a missing section, and repeat updates idempotently.
 
 ## Validation still pending
-- [x] Execute repository metadata validation and the full Python unit-test suite in GitHub Actions; latest run passed: [run 44489478902](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/actions/runs/44489478902).
+- [x] Execute repository metadata validation and the full Python unit-test suite in GitHub Actions; latest run passed: [run 44489705378](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/actions/runs/44489705378).
 - [ ] Run `Scripts/qa_relay_station.py` inside Unreal Editor after generating the map; inspect `Saved/RelayStation01_QA.json`.
 - [ ] Generate project files and compile with UnrealBuildTool on UE 5.4.
 - [ ] Run `Scripts/create_relay_station_map.py` inside Unreal Editor and verify that the `.umap` is saved.
