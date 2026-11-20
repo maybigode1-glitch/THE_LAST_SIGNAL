@@ -24,9 +24,11 @@
 - [x] Offline QA regression tests for duplicate generated labels and required labels assigned to unexpected actor classes, including cases where aggregate class counts still match.
 - [x] Offline tests for the map builder INI helper: update existing keys while preserving unrelated settings, create a missing section, and repeat updates idempotently.
 
+## Automated validation
+- [x] Repository metadata validation and full Python unit-test suite passed in [GitHub Actions run 44706731419](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/actions/runs/44706731419).
+- [x] Standalone battery inventory C++ regression executable compiled with GCC C++17 and passed all 10 cases in the same [run 44706731419](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/actions/runs/44706731419).
+
 ## Validation still pending
-- [x] Execute repository metadata validation and the full Python unit-test suite in GitHub Actions; latest prior run passed: [run 44521174644](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/actions/runs/44521174644).
-- [ ] Confirm the new standalone battery inventory C++ regression executable compiles and passes in GitHub Actions.
 - [ ] Run `Scripts/qa_relay_station.py` inside Unreal Editor after generating the map; inspect `Saved/RelayStation01_QA.json`.
 - [ ] Generate project files and compile with UnrealBuildTool on UE 5.4.
 - [ ] Run `Scripts/create_relay_station_map.py` inside Unreal Editor and verify that the `.umap` is saved.
