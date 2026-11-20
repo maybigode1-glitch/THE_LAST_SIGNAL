@@ -1,7 +1,6 @@
 """Keep the Unreal map builder and editor QA actor contract in sync."""
 import ast
 import unittest
-from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
