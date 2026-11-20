@@ -22,11 +22,11 @@
 - [x] Unreal Editor structural QA script for the generated Relay Station map, with a JSON report and explicit pass/fail checks.
 - [x] Offline unit tests for the Editor QA report logic: passing actor set, missing stalker, wrong map, and missing required generated labels.
 - [x] Offline QA regression tests for duplicate generated labels and required labels assigned to unexpected actor classes, including cases where aggregate class counts still match.
+- [x] AST-based contract test verifies that the map builder creates exactly the eight QA-required generated actors with their expected Unreal class names.
 - [x] Offline tests for the map builder INI helper: update existing keys while preserving unrelated settings, create a missing section, and repeat updates idempotently.
 
 ## Automated validation
-- [x] Repository metadata validation and full Python unit-test suite passed in [GitHub Actions run 44706731419](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/actions/runs/44706731419).
-- [x] Standalone battery inventory C++ regression executable compiled with GCC C++17 and passed all 10 cases in the same [run 44706731419](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/actions/runs/44706731419).
+- [x] Repository metadata validation, full Python unit-test suite (including the builder/QA contract test), and standalone battery inventory C++ regression executable (10 cases) passed in [GitHub Actions run 44739207003](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/actions/runs/44739207003).
 
 ## Validation still pending
 - [ ] Run `Scripts/qa_relay_station.py` inside Unreal Editor after generating the map; inspect `Saved/RelayStation01_QA.json`.
