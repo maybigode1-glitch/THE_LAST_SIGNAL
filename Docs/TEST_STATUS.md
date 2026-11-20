@@ -5,6 +5,8 @@
 - [x] First-person character, movement, mouse look, and flashlight battery drain.
 - [x] E-key interactable base actor and Blueprint-native interaction event.
 - [x] Battery pickup actor and R-key inventory use.
+- [x] Battery-pack inventory addition uses a shared overflow-safe int64 intermediate and retains the 0..99 cap.
+- [x] Standalone native C++ regression cases for ordinary additions, cap behavior, non-positive amounts, and int32 boundary values.
 - [x] GameMode objective counter and configurable target (default 3).
 - [x] Native C++ survival HUD source for flashlight, inventory, health, objectives, and reticle.
 - [x] Stalker AI source for patrol, sight detection, pursuit, search, and melee attacks.
@@ -23,7 +25,8 @@
 - [x] Offline tests for the map builder INI helper: update existing keys while preserving unrelated settings, create a missing section, and repeat updates idempotently.
 
 ## Validation still pending
-- [x] Execute repository metadata validation and the full Python unit-test suite in GitHub Actions; latest run passed: [run 44489705378](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/actions/runs/44489705378).
+- [x] Execute repository metadata validation and the full Python unit-test suite in GitHub Actions; latest prior run passed: [run 44521174644](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/actions/runs/44521174644).
+- [ ] Confirm the new standalone battery inventory C++ regression executable compiles and passes in GitHub Actions.
 - [ ] Run `Scripts/qa_relay_station.py` inside Unreal Editor after generating the map; inspect `Saved/RelayStation01_QA.json`.
 - [ ] Generate project files and compile with UnrealBuildTool on UE 5.4.
 - [ ] Run `Scripts/create_relay_station_map.py` inside Unreal Editor and verify that the `.umap` is saved.
@@ -34,4 +37,4 @@
 - [ ] Assign skeletal mesh, Animation Blueprint, attack montage, and audio assets; test in runtime.
 - [ ] Produce Windows packaged build and perform gameplay QA.
 
-The offline Editor-QA unit tests use a small Unreal Python API double to test the script's report/pass/fail logic; they do not execute Unreal Editor. They verify report generation, required labels, duplicate-label rejection, and required label-to-class mappings. The INI-helper tests use standard-library temporary files and do not execute Unreal Editor. Repository checks are static/Python checks only; they do not prove Unreal compilation, editor startup, map generation, runtime behavior, or packaging.
+The offline Editor-QA unit tests use a small Unreal Python API double to test the script's report/pass/fail logic; they do not execute Unreal Editor. They verify report generation, required labels, duplicate-label rejection, and required label-to-class mappings. The standalone battery inventory test compiles and executes the exact arithmetic header included by the character source, but does not compile the Unreal module. The INI-helper tests use standard-library temporary files and do not execute Unreal Editor. Repository checks are static/Python checks plus the isolated C++ helper test; they do not prove Unreal compilation, editor startup, map generation, runtime behavior, or packaging.
