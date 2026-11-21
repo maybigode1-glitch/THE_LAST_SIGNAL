@@ -74,7 +74,7 @@ class RelayStationBuilderPreflightTests(unittest.TestCase):
         fake.load_object = lambda *_args: None
         builder = load_builder(fake)
 
-        with self.assertRaisesRegex(RuntimeError, "Cube.Cube"):
+        with self.assertRaisesRegex(RuntimeError, "BasicShapes/Cube"):
             builder.build_level()
 
         self.assertEqual(events, [])
