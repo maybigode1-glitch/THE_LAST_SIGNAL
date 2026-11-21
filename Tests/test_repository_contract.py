@@ -28,6 +28,11 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertIn('ActionName="UseBattery",Key=R', config)
         for token in ("USpotLightComponent", "FlashlightDrainPerSecond", "AddBatteryPack", "UseBatteryPack"):
             self.assertIn(token, source)
+    def test_battery_inventory_uses_overflow_safe_shared_helper(self):
+        source = (ROOT / "Source/TheLastSignal/Private/LastSignalCharacter.cpp").read_text(encoding="utf-8")
+        self.assertIn('#include "BatteryInventoryMath.h"', source)
+        self.assertIn("LastSignal::AddBatteryPacks(BatteryPacks, Amount)", source)
+        self.assertNotIn("FMath::Clamp(BatteryPacks + Amount", source)
     def test_battery_pickup_adds_inventory_and_is_consumed(self):
         source = (ROOT / "Source/TheLastSignal/Private/SignalBatteryPickup.cpp").read_text(encoding="utf-8")
         self.assertIn("AddBatteryPack", source)
@@ -53,6 +58,23 @@ class RepositoryContractTests(unittest.TestCase):
         for token in ("LineOfSightTo", "MoveToActor", "MoveToLocation", "PerformAttack", "GetRandomReachablePointInRadius"):
             self.assertIn(token, source)
         self.assertIn("AIModule", (ROOT / "Source/TheLastSignal/TheLastSignal.Build.cs").read_text(encoding="utf-8"))
+    def test_stalker_attack_defers_damage_and_revalidates_at_impact(self):
+        source = (ROOT / "Source/TheLastSignal/Private/SignalStalker.cpp").read_text(encoding="utf-8")
+        attack = source.split("void ASignalStalker::PerformAttack()", 1)[1].split(
+            "void ASignalStalker::ApplyAttackDamage()", 1
+        )[0]
+        impact = source.split("void ASignalStalker::ApplyAttackDamage()", 1)[1].split(
+            "void ASignalStalker::ClearAttackState()", 1
+        )[0]
+
+        self.assertIn("&ASignalStalker::ApplyAttackDamage", attack)
+        self.assertIn("AttackImpactDelay", attack)
+        self.assertIn("AttackMontage->GetPlayLength() * 0.35f", attack)
+        self.assertIn(": 0.3f", attack)
+        self.assertNotIn("TakeDamage", attack)
+        self.assertIn("Distance > AttackRange + 75.0f", impact)
+        self.assertIn("AI->LineOfSightTo(Player)", impact)
+        self.assertIn("Player->TakeDamage", impact)
     def test_player_health_and_death_are_connected_to_hud(self):
         character = (ROOT / "Source/TheLastSignal/Private/LastSignalCharacter.cpp").read_text(encoding="utf-8")
         hud = (ROOT / "Source/TheLastSignal/Private/LastSignalHUD.cpp").read_text(encoding="utf-8")

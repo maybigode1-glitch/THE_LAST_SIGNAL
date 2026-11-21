@@ -1,4 +1,5 @@
 #include "LastSignalCharacter.h"
+#include "BatteryInventoryMath.h"
 #include "SignalInteractable.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
@@ -103,7 +104,7 @@ void ALastSignalCharacter::ToggleFlashlight()
 void ALastSignalCharacter::AddBatteryPack(int32 Amount)
 {
     if (Amount <= 0 || bIsDead) return;
-    BatteryPacks = FMath::Clamp(BatteryPacks + Amount, 0, 99);
+    BatteryPacks = LastSignal::AddBatteryPacks(BatteryPacks, Amount);
     if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Battery pack collected | Inventory: %d"), BatteryPacks));
 }
 void ALastSignalCharacter::UseBatteryPack()

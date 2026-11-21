@@ -24,3 +24,10 @@ jobs:
         run: python Scripts/validate_project.py
       - name: Run unit tests
         run: python -m unittest discover -s Tests -v
+      - name: Compile and run battery inventory C++ regression tests
+        run: |
+          g++ -std=c++17 -Wall -Wextra -Werror -pedantic \
+            -I Source/TheLastSignal/Public \
+            Tests/test_battery_inventory.cpp \
+            -o /tmp/test_battery_inventory
+          /tmp/test_battery_inventory

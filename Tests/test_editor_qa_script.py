@@ -62,11 +62,14 @@ class EditorQAScriptTests(unittest.TestCase):
         self.addCleanup(self.temp_dir.cleanup)
         self.world = _World("/Game/Maps/LVL_RelayStation01")
         self.actors = [
-            _Actor("PlayerStart", "RS01_AUTO_PlayerStart"),
-            _Actor("NavMeshBoundsVolume", "RS01_AUTO_NavMeshBounds"),
-            *[_Actor("SignalInteractable", f"RS01_AUTO_Terminal{i}") for i in range(3)],
-            *[_Actor("SignalBatteryPickup", f"RS01_AUTO_Battery{i}") for i in range(2)],
-            _Actor("SignalStalker", "RS01_AUTO_Stalker"),
+            _Actor("PlayerStart", "RS01_AUTO_PlayerStart_WestEntrance"),
+            _Actor("NavMeshBoundsVolume", "RS01_AUTO_NavMeshBounds_RelayStation"),
+            _Actor("SignalInteractable", "RS01_AUTO_TerminalA"),
+            _Actor("SignalInteractable", "RS01_AUTO_TerminalB"),
+            _Actor("SignalInteractable", "RS01_AUTO_PrimaryUplink"),
+            _Actor("SignalBatteryPickup", "RS01_AUTO_BatteryA"),
+            _Actor("SignalBatteryPickup", "RS01_AUTO_BatteryB"),
+            _Actor("SignalStalker", "RS01_AUTO_Stalker_AI_NoAssignedMesh"),
         ]
         _FAKE_UNREAL.EditorLevelLibrary = types.SimpleNamespace(
             get_editor_world=lambda: self.world,
@@ -83,6 +86,9 @@ class EditorQAScriptTests(unittest.TestCase):
         self.assertTrue(all(report["checks"].values()))
         self.assertEqual(report["actor_count"], 8)
         self.assertEqual(len(report["generated_actor_labels"]), 8)
+        self.assertEqual(report["missing_generated_labels"], [])
+        self.assertEqual(report["duplicate_generated_labels"], [])
+        self.assertEqual(report["wrong_generated_actor_classes"], {})
         report_path = Path(self.temp_dir.name) / "RelayStation01_QA.json"
         self.assertTrue(report_path.is_file())
         saved = json.loads(report_path.read_text(encoding="utf-8"))
@@ -104,6 +110,46 @@ class EditorQAScriptTests(unittest.TestCase):
         report_path = Path(self.temp_dir.name) / "RelayStation01_QA.json"
         saved = json.loads(report_path.read_text(encoding="utf-8"))
         self.assertFalse(saved["checks"]["correct_map_open"])
+
+    def test_wrong_terminal_labels_fail_even_when_class_counts_match(self):
+        self.actors[2] = _Actor("SignalInteractable", "RS01_AUTO_DecoyTerminal")
+        with self.assertRaisesRegex(RuntimeError, "required_generated_actors"):
+            _MODULE.run_qa()
+        report_path = Path(self.temp_dir.name) / "RelayStation01_QA.json"
+        saved = json.loads(report_path.read_text(encoding="utf-8"))
+        self.assertEqual(saved["class_counts"]["SignalInteractable"], 3)
+        self.assertFalse(saved["checks"]["required_generated_actors"])
+        self.assertEqual(saved["missing_generated_labels"], ["RS01_AUTO_TerminalA"])
+
+    def test_duplicate_generated_label_fails_even_when_all_required_labels_exist(self):
+        self.actors.append(_Actor("SignalInteractable", "RS01_AUTO_TerminalA"))
+        with self.assertRaisesRegex(RuntimeError, "unique_generated_actor_labels"):
+            _MODULE.run_qa()
+        report_path = Path(self.temp_dir.name) / "RelayStation01_QA.json"
+        saved = json.loads(report_path.read_text(encoding="utf-8"))
+        self.assertTrue(saved["checks"]["required_generated_actors"])
+        self.assertFalse(saved["checks"]["unique_generated_actor_labels"])
+        self.assertEqual(saved["duplicate_generated_labels"], ["RS01_AUTO_TerminalA"])
+
+    def test_required_label_with_wrong_class_fails_even_when_class_counts_match(self):
+        self.actors[2] = _Actor("StaticMeshActor", "RS01_AUTO_TerminalA")
+        self.actors.append(_Actor("SignalInteractable", "RS01_AUTO_ExtraTerminal"))
+        with self.assertRaisesRegex(RuntimeError, "required_generated_actor_classes"):
+            _MODULE.run_qa()
+        report_path = Path(self.temp_dir.name) / "RelayStation01_QA.json"
+        saved = json.loads(report_path.read_text(encoding="utf-8"))
+        self.assertEqual(saved["class_counts"]["SignalInteractable"], 3)
+        self.assertTrue(saved["checks"]["required_generated_actors"])
+        self.assertFalse(saved["checks"]["required_generated_actor_classes"])
+        self.assertEqual(
+            saved["wrong_generated_actor_classes"],
+            {
+                "RS01_AUTO_TerminalA": {
+                    "expected": "SignalInteractable",
+                    "actual": ["StaticMeshActor"],
+                }
+            },
+        )
 
 
 if __name__ == "__main__":
