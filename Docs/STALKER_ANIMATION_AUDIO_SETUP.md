@@ -45,7 +45,7 @@ Use a Slot node in the AnimGraph (for example, `DefaultGroup.DefaultSlot`) so th
 3. Put the montage in the same slot used by the AnimGraph.
 4. Assign it to `AttackMontage` on the enemy Blueprint.
 
-When the AI attacks, C++ plays the montage and raises `bIsAttacking` for the montage duration (or a short fallback window if no montage is assigned). The current damage application is immediate at attack start; use animation notifies and a future combat-window refinement if damage must land exactly on a contact frame.
+When the AI attacks, C++ plays the montage and raises `bIsAttacking` for the montage duration (or a 0.45-second fallback window when no montage is assigned). Damage is scheduled after a wind-up: 35% of the montage length, clamped to 0.2–0.6 seconds, or 0.3 seconds without a montage. At impact, the code reacquires the player and skips damage if the player is dead, farther than `AttackRange + 75 cm`, or (when an AI controller is available) no longer visible. This gives the player a short dodge window, but the impact is timer-based rather than synchronized to an animation notify. The timing and dodge behavior still require an Unreal runtime playtest.
 
 ## 4. Sound assets
 
