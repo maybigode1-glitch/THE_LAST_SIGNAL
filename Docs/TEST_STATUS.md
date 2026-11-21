@@ -33,9 +33,9 @@
 - [x] GitHub Actions workflow runs repository metadata validation, the complete Python unit-test suite (including map-builder preflight/cleanup regressions), and the standalone battery inventory C++ regression executable (10 cases). See the latest checks on [PR #2](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/pull/2).
 
 ## Validation still pending
-- [ ] Run \`Scripts/qa_relay_station.py\` inside Unreal Editor after generating the map; inspect \`Saved/RelayStation01_QA.json\`.
+- [ ] Run `Scripts/qa_relay_station.py` inside Unreal Editor after generating the map; inspect `Saved/RelayStation01_QA.json`.
 - [ ] Generate project files and compile with UnrealBuildTool on UE 5.4.
-- [ ] Run \`Scripts/create_relay_station_map.py\` inside Unreal Editor and verify that the \`.umap\` is saved.
+- [ ] Run `Scripts/create_relay_station_map.py` inside Unreal Editor and verify that the `.umap` is saved.
 - [ ] Verify PlayerStart spawn and GameMode/HUD selection.
 - [ ] Verify NavMesh generation (press P; use Build > Build Paths if needed).
 - [ ] Verify collision, interaction reach, three terminals, two pickups, and stalker pathfinding in runtime.
