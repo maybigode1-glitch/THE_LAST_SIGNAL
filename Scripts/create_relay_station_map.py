@@ -62,17 +62,70 @@ def update_ini_section(file_path, section_name, values):
         handle.write("\n".join(lines) + "\n")
 
 
+def preflight_assets():
+    """Resolve every required asset/class before opening or replacing the level."""
+    cube = unreal.load_object(None, "/Engine/BasicShapes/Cube.Cube")
+    if not cube:
+        raise RuntimeError(
+            "Unreal Engine BasicShapes/Cube asset was not found. "
+            "The existing level was not modified."
+        )
+
+    interactable_class = unreal.load_class(None, "/Script/TheLastSignal.SignalInteractable")
+    battery_class = unreal.load_class(None, "/Script/TheLastSignal.SignalBatteryPickup")
+    stalker_class = unreal.load_class(None, "/Script/TheLastSignal.SignalStalker")
+    nav_class = unreal.load_class(None, "/Script/NavigationSystem.NavMeshBoundsVolume")
+
+    missing = [
+        name
+        for name, value in (
+            ("SignalInteractable", interactable_class),
+            ("SignalBatteryPickup", battery_class),
+            ("SignalStalker", stalker_class),
+            ("NavMeshBoundsVolume", nav_class),
+            ("StaticMeshActor", getattr(unreal, "StaticMeshActor", None)),
+            ("PlayerStart", getattr(unreal, "PlayerStart", None)),
+        )
+        if not value
+    ]
+    if missing:
+        raise RuntimeError(
+            "Required Unreal classes are unavailable: " + ", ".join(missing) + ". "
+            "Compile THE_LAST_SIGNAL in UE 5.4 and verify Navigation System is enabled. "
+            "The existing level was not modified."
+        )
+
+    return cube, interactable_class, battery_class, stalker_class, nav_class
+
+
 def label_actor(actor, label):
     actor.set_actor_label(GENERATED_PREFIX + label)
 
 
 def destroy_previous_generated_actors():
+    failed_labels = []
+    removed_count = 0
     for actor in unreal.EditorLevelLibrary.get_all_level_actors():
+        label = actor.get_actor_label()
+        if not label.startswith(GENERATED_PREFIX):
+            continue
         try:
-            if actor.get_actor_label().startswith(GENERATED_PREFIX):
-                unreal.EditorLevelLibrary.destroy_actor(actor)
-        except Exception:
-            pass
+            removed = unreal.EditorLevelLibrary.destroy_actor(actor)
+        except Exception as exc:
+            failed_labels.append(label + " (" + str(exc) + ")")
+            continue
+        if not removed:
+            failed_labels.append(label)
+        else:
+            removed_count += 1
+
+    if failed_labels:
+        raise RuntimeError(
+            "Could not remove previous generated actors; generation aborted. "
+            "Inspect the level before retrying because some actors may already have "
+            "been removed: " + ", ".join(failed_labels)
+        )
+    log("Removed " + str(removed_count) + " previous generated actors.")
 
 
 def spawn_actor(actor_class, location, rotation, label):
@@ -110,6 +163,9 @@ def spawn_interactable(actor_class, cube_mesh, label, interaction_name,
 
 
 def build_level():
+    cube, interactable_class, battery_class, stalker_class, nav_class = preflight_assets()
+    log("Preflight passed: required mesh and actor classes are available.")
+
     unreal.EditorAssetLibrary.make_directory(MAP_DIR)
 
     if unreal.EditorAssetLibrary.does_asset_exist(MAP_ASSET):
@@ -120,10 +176,6 @@ def build_level():
     else:
         if not unreal.EditorLevelLibrary.new_level(MAP_ASSET):
             raise RuntimeError("Could not create level " + MAP_ASSET)
-
-    cube = unreal.load_object(None, "/Engine/BasicShapes/Cube.Cube")
-    if not cube:
-        raise RuntimeError("Unreal Engine BasicShapes/Cube asset was not found.")
 
     # Permanent editor-level geometry: navmesh can see this floor and these walls.
     spawn_cube(cube, "Floor", (0, 0, -10), (30, 22, 0.2))
@@ -147,14 +199,6 @@ def build_level():
     spawn_cube(cube, "CoverCrateC", (900, 250, 65), (1.6, 1.0, 1.3))
     spawn_cube(cube, "CoverCrateD", (-1050, -250, 65), (1.0, 1.4, 1.3))
 
-    interactable_class = unreal.load_class(None, "/Script/TheLastSignal.SignalInteractable")
-    battery_class = unreal.load_class(None, "/Script/TheLastSignal.SignalBatteryPickup")
-    stalker_class = unreal.load_class(None, "/Script/TheLastSignal.SignalStalker")
-    if not interactable_class or not battery_class or not stalker_class:
-        raise RuntimeError(
-            "THE_LAST_SIGNAL C++ classes were not loaded. Compile the project in UE 5.4, restart the Editor, and run this script again."
-        )
-
     # Three signal objectives and two recoverable battery packs.
     spawn_interactable(interactable_class, cube, "TerminalA", "Relay Terminal A",
                        (-250, -650, 55), (0.65, 0.65, 1.1))
@@ -173,9 +217,6 @@ def build_level():
     )
 
     # The default NavMeshBoundsVolume brush is scaled to cover the 30 x 22 m play area.
-    nav_class = unreal.load_class(None, "/Script/NavigationSystem.NavMeshBoundsVolume")
-    if not nav_class:
-        raise RuntimeError("NavMeshBoundsVolume class unavailable; enable Navigation System.")
     nav_volume = spawn_actor(
         nav_class, (0, 0, 200), (0.0, 0.0, 0.0), "NavMeshBounds_RelayStation"
     )
@@ -184,24 +225,6 @@ def build_level():
     # Stalker AI is placed in the eastern maintenance hall. Its skeletal art is a separate setup task.
     stalker = spawn_actor(
         stalker_class, (950, 0, 100), (0.0, 180.0, 0.0), "Stalker_AI_NoAssignedMesh"
-    )
-
-    # Project defaults point both the editor and packaged game at this map.
-    update_ini_section(
-        DEFAULT_ENGINE_INI,
-        "/Script/EngineSettings.GameMapsSettings",
-        {
-            "EditorStartupMap": MAP_OBJECT,
-            "GameDefaultMap": MAP_OBJECT,
-            "GlobalDefaultGameMode": "/Script/TheLastSignal.LastSignalGameMode",
-        },
-    )
-
-    # Dynamic Recast generation ensures the placed bounds volume can generate runtime navigation.
-    update_ini_section(
-        DEFAULT_ENGINE_INI,
-        "/Script/NavigationSystem.RecastNavMesh",
-        {"RuntimeGeneration": "Dynamic"},
     )
 
     # Ask the editor to build level data (including navigation where supported by this UE version).
@@ -215,7 +238,25 @@ def build_level():
     if not unreal.EditorLevelLibrary.save_current_level():
         raise RuntimeError("Map save failed. Save the level manually in Unreal Editor.")
 
-    unreal.EditorAssetLibrary.save_asset(MAP_ASSET, only_if_is_dirty=False)
+    if not unreal.EditorAssetLibrary.save_asset(MAP_ASSET, only_if_is_dirty=False):
+        raise RuntimeError("Map asset save failed. Project startup settings were not changed.")
+
+    # Update project defaults only after the level asset has been saved successfully.
+    update_ini_section(
+        DEFAULT_ENGINE_INI,
+        "/Script/EngineSettings.GameMapsSettings",
+        {
+            "EditorStartupMap": MAP_OBJECT,
+            "GameDefaultMap": MAP_OBJECT,
+            "GlobalDefaultGameMode": "/Script/TheLastSignal.LastSignalGameMode",
+        },
+    )
+    update_ini_section(
+        DEFAULT_ENGINE_INI,
+        "/Script/NavigationSystem.RecastNavMesh",
+        {"RuntimeGeneration": "Dynamic"},
+    )
+
     log("SUCCESS: saved " + MAP_OBJECT)
     log("PlayerStart, NavMeshBoundsVolume, 3 terminals, 2 batteries, stalker AI, and map defaults are configured.")
     log("Check the green NavMesh visualization with P. If absent, use Build > Build Paths.")
