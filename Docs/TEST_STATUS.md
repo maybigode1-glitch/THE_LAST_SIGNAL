@@ -17,21 +17,25 @@
 - [x] Configurable enemy audio hooks for footsteps, alert, attack, search, ambient, and chase.
 - [x] Runtime greybox builder source for Relay Station 01.
 - [x] Unreal Editor Python automation script for persistent level geometry, objectives, pickups, PlayerStart, NavMeshBoundsVolume, stalker AI, and map startup configuration.
+- [x] Map-builder preflight resolves required mesh/classes before opening or replacing the existing level.
+- [x] Generated-actor cleanup failures are reported and stop regeneration instead of being silently ignored.
+- [x] Project startup-map settings are updated only after the level and map asset save calls succeed.
 - [x] PythonScriptPlugin and EditorScriptingUtilities enabled in the project descriptor.
 - [x] First-area automation guide and repository validator/test coverage.
 - [x] Unreal Editor structural QA script for the generated Relay Station map, with a JSON report and explicit pass/fail checks.
 - [x] Offline unit tests for the Editor QA report logic: passing actor set, missing stalker, wrong map, and missing required generated labels.
 - [x] Offline QA regression tests for duplicate generated labels and required labels assigned to unexpected actor classes, including cases where aggregate class counts still match.
 - [x] AST-based contract test verifies that the map builder creates exactly the eight QA-required generated actors with their expected Unreal class names.
+- [x] Offline map-builder preflight tests verify missing assets/classes abort before level mutation, failed generated-actor deletion is surfaced, and startup settings are written after save calls.
 - [x] Offline tests for the map builder INI helper: update existing keys while preserving unrelated settings, create a missing section, and repeat updates idempotently.
 
 ## Automated validation
-- [x] Repository metadata validation, full Python unit-test suite (including the builder/QA contract test), and standalone battery inventory C++ regression executable (10 cases) passed in [GitHub Actions run 44739207003](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/actions/runs/44739207003).
+- [x] GitHub Actions workflow runs repository metadata validation, the complete Python unit-test suite (including map-builder preflight/cleanup regressions), and the standalone battery inventory C++ regression executable (10 cases). See the latest checks on [PR #2](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/pull/2).
 
 ## Validation still pending
-- [ ] Run `Scripts/qa_relay_station.py` inside Unreal Editor after generating the map; inspect `Saved/RelayStation01_QA.json`.
+- [ ] Run \`Scripts/qa_relay_station.py\` inside Unreal Editor after generating the map; inspect \`Saved/RelayStation01_QA.json\`.
 - [ ] Generate project files and compile with UnrealBuildTool on UE 5.4.
-- [ ] Run `Scripts/create_relay_station_map.py` inside Unreal Editor and verify that the `.umap` is saved.
+- [ ] Run \`Scripts/create_relay_station_map.py\` inside Unreal Editor and verify that the \`.umap\` is saved.
 - [ ] Verify PlayerStart spawn and GameMode/HUD selection.
 - [ ] Verify NavMesh generation (press P; use Build > Build Paths if needed).
 - [ ] Verify collision, interaction reach, three terminals, two pickups, and stalker pathfinding in runtime.
@@ -39,4 +43,4 @@
 - [ ] Assign skeletal mesh, Animation Blueprint, attack montage, and audio assets; test in runtime.
 - [ ] Produce Windows packaged build and perform gameplay QA.
 
-The offline Editor-QA unit tests use a small Unreal Python API double to test the script's report/pass/fail logic; they do not execute Unreal Editor. They verify report generation, required labels, duplicate-label rejection, and required label-to-class mappings. The standalone battery inventory test compiles and executes the exact arithmetic header included by the character source, but does not compile the Unreal module. The INI-helper tests use standard-library temporary files and do not execute Unreal Editor. Repository checks are static/Python checks plus the isolated C++ helper test; they do not prove Unreal compilation, editor startup, map generation, runtime behavior, or packaging.
+The offline Editor-QA unit tests use a small Unreal Python API double to test the script's report/pass/fail behavior; they do not execute Unreal Editor. The map-builder preflight tests use the same limited approach to check failure ordering and cleanup error handling, not actual level operations. The standalone battery inventory test compiles and executes the exact arithmetic header included by the character source, but does not compile the Unreal module. The INI-helper tests use standard-library temporary files and do not execute Unreal Editor. Repository checks do not prove Unreal compilation, editor startup, map generation, runtime behavior, or packaging.
