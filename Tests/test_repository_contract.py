@@ -31,7 +31,7 @@ class RepositoryContractTests(unittest.TestCase):
     def test_battery_inventory_uses_overflow_safe_shared_helper(self):
         source = (ROOT / "Source/TheLastSignal/Private/LastSignalCharacter.cpp").read_text(encoding="utf-8")
         self.assertIn('#include "BatteryInventoryMath.h"', source)
-        self.assertIn("LastSignal::AddBatteryPacks(BatteryPacks, Amount)", source)
+        self.assertIn("LastSignal::TryAddBatteryPacks(BatteryPacks, Amount, UpdatedBatteryPacks)", source)
         self.assertNotIn("FMath::Clamp(BatteryPacks + Amount", source)
     def test_battery_pickup_is_consumed_only_after_inventory_accepts_pack(self):
         pickup = (ROOT / "Source/TheLastSignal/Private/SignalBatteryPickup.cpp").read_text(encoding="utf-8")
