@@ -1,4 +1,5 @@
 #include "SignalStalker.h"
+#include "StalkerMeleeRules.h"
 #include "SignalStalkerAnimInstance.h"
 #include "LastSignalCharacter.h"
 #include "AIController.h"
@@ -225,12 +226,14 @@ void ASignalStalker::ApplyAttackDamage()
     ALastSignalCharacter* Player = Cast<ALastSignalCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
     if (!Player || Player->IsDead()) return;
 
-    // The player can dodge during the wind-up; damage only lands if still in melee range and visible.
+    // The player can dodge during the wind-up; fail closed if AI possession or line of sight is lost.
     const float Distance = FVector::Dist(GetActorLocation(), Player->GetActorLocation());
     AAIController* AI = Cast<AAIController>(GetController());
-    if (Distance > AttackRange + 75.0f || (AI && !AI->LineOfSightTo(Player))) return;
+    const bool bHasAIController = AI != nullptr;
+    const bool bHasLineOfSight = bHasAIController && AI->LineOfSightTo(Player);
+    if (!LastSignal::CanApplyStalkerMeleeDamage(Distance, AttackRange, bHasAIController, bHasLineOfSight)) return;
 
-    Player->TakeDamage(AttackDamage, FDamageEvent(), GetController(), this);
+    Player->TakeDamage(AttackDamage, FDamageEvent(), AI, this);
 }
 
 void ASignalStalker::ClearAttackState()
