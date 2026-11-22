@@ -78,8 +78,13 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertIn("AttackMontage->GetPlayLength() * 0.35f", attack)
         self.assertIn(": 0.3f", attack)
         self.assertNotIn("TakeDamage", attack)
-        self.assertIn("Distance > AttackRange + 75.0f", impact)
-        self.assertIn("AI->LineOfSightTo(Player)", impact)
+        self.assertIn('#include "StalkerMeleeRules.h"', source)
+        self.assertIn("const bool bHasLineOfSight = bHasAIController && AI->LineOfSightTo(Player);", impact)
+        self.assertIn(
+            "LastSignal::CanApplyStalkerMeleeDamage(Distance, AttackRange, bHasAIController, bHasLineOfSight)",
+            impact
+        )
+        self.assertLess(impact.index("CanApplyStalkerMeleeDamage"), impact.index("Player->TakeDamage"))
         self.assertIn("Player->TakeDamage", impact)
     def test_player_health_and_death_are_connected_to_hud(self):
         character = (ROOT / "Source/TheLastSignal/Private/LastSignalCharacter.cpp").read_text(encoding="utf-8")
@@ -99,7 +104,7 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertIn("Montage_Play", enemy)
         self.assertIn("ApplyAttackDamage", enemy)
         self.assertIn("AttackImpactTimer", enemy)
-        self.assertIn("AttackRange + 75.0f", enemy)
+        self.assertIn("StalkerMeleeRangeGrace = 75.0f", (ROOT / "Source/TheLastSignal/Public/StalkerMeleeRules.h").read_text(encoding="utf-8"))
         self.assertIn("GreyboxVisual", enemy)
         self.assertIn("BasicShapes/Cube.Cube", enemy)
     def test_stalker_audio_cues_are_configurable_and_triggered(self):
