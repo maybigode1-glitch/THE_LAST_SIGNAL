@@ -101,11 +101,20 @@ void ALastSignalCharacter::ToggleFlashlight()
     bFlashlightOn = true;
     Flashlight->SetVisibility(true);
 }
-void ALastSignalCharacter::AddBatteryPack(int32 Amount)
+bool ALastSignalCharacter::AddBatteryPack(int32 Amount)
 {
-    if (Amount <= 0 || bIsDead) return;
-    BatteryPacks = LastSignal::AddBatteryPacks(BatteryPacks, Amount);
+    if (Amount <= 0 || bIsDead) return false;
+
+    int32 UpdatedBatteryPacks = BatteryPacks;
+    if (!LastSignal::TryAddBatteryPacks(BatteryPacks, Amount, UpdatedBatteryPacks))
+    {
+        if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, TEXT("Battery inventory full"));
+        return false;
+    }
+
+    BatteryPacks = UpdatedBatteryPacks;
     if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Battery pack collected | Inventory: %d"), BatteryPacks));
+    return true;
 }
 void ALastSignalCharacter::UseBatteryPack()
 {
