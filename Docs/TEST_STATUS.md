@@ -6,7 +6,8 @@
 - [x] E-key interactable base actor and Blueprint-native interaction event.
 - [x] Battery pickup actor and R-key inventory use.
 - [x] Battery-pack inventory addition uses a shared overflow-safe int64 intermediate and retains the 0..99 cap.
-- [x] Standalone native C++ regression cases for ordinary additions, cap behavior, non-positive amounts, and int32 boundary values.
+- [x] Battery pickups are consumed only when the inventory count increases; a full inventory leaves the pickup available.
+- [x] Standalone native C++ regression cases for ordinary additions, cap behavior, accepted/rejected pickup additions, non-positive amounts, and int32 boundary values.
 - [x] GameMode objective counter and configurable target (default 3).
 - [x] Native C++ survival HUD source for flashlight, inventory, health, objectives, and reticle.
 - [x] Stalker AI source for patrol, sight detection, pursuit, search, and melee attacks.
@@ -30,7 +31,7 @@
 - [x] Offline tests for the map builder INI helper: update existing keys while preserving unrelated settings, create a missing section, and repeat updates idempotently.
 
 ## Automated validation
-- [x] GitHub Actions workflow runs repository metadata validation, the complete Python unit-test suite (including map-builder preflight/cleanup regressions), and the standalone battery inventory C++ regression executable (10 cases). See the latest checks on [PR #2](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/pull/2).
+- [x] GitHub Actions workflow runs repository metadata validation, the complete Python unit-test suite (including map-builder preflight/cleanup regressions), and the standalone battery inventory C++ regression executable (16 cases). See the latest checks on [PR #2](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/pull/2).
 
 ## Validation still pending
 - [ ] Run `Scripts/qa_relay_station.py` inside Unreal Editor after generating the map; inspect `Saved/RelayStation01_QA.json`.
