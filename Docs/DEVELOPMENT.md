@@ -9,7 +9,7 @@ GitHub Actions uses a GitHub-hosted Ubuntu runner for checks that do not require
 - `Scripts/validate_project.py` checks the project descriptor, required repository files, and basic Unreal project metadata.
 - `python -m unittest discover -s Tests -v` runs the complete Python regression suite. This includes project metadata checks, INI-helper behavior, mocked Unreal Editor QA behavior, the map-builder/QA actor contract, and map-builder preflight/cleanup contracts.
 - The map-builder preflight tests use a narrow Unreal API double to verify that missing required assets/classes abort before the existing level is opened or cleared, failed actor deletion is reported, and project startup settings are updated only after the level and asset save calls succeed. They do not execute Unreal Editor.
-- A standalone C++17 executable compiles the exact `BatteryInventoryMath.h` header included by the character source, with `-Wall -Wextra -Werror -pedantic`, and runs 10 battery-inventory arithmetic cases.
+- A standalone C++17 executable compiles the exact `BatteryInventoryMath.h` header included by the character source, with `-Wall -Wextra -Werror -pedantic`, and runs 16 battery-inventory arithmetic and pickup-acceptance cases.
 
 The standalone C++ test validates the arithmetic helper only. It does not compile the Unreal module or exercise Unreal reflection, gameplay, or Blueprint integration.
 
