@@ -13,7 +13,7 @@ public:
     UFUNCTION(BlueprintPure, Category = "Flashlight") float GetFlashlightBatteryPercent() const { return FlashlightBattery; }
     UFUNCTION(BlueprintPure, Category = "Flashlight") bool IsFlashlightOn() const { return bFlashlightOn; }
     UFUNCTION(BlueprintPure, Category = "Inventory") int32 GetBatteryPackCount() const { return BatteryPacks; }
-    UFUNCTION(BlueprintCallable, Category = "Inventory") void AddBatteryPack(int32 Amount = 1);
+    UFUNCTION(BlueprintCallable, Category = "Inventory") bool AddBatteryPack(int32 Amount = 1);
     UFUNCTION(BlueprintCallable, Category = "Inventory") void UseBatteryPack();
     UFUNCTION(BlueprintPure, Category = "Health") float GetHealthPercent() const { return Health; }
     UFUNCTION(BlueprintPure, Category = "Health") bool IsDead() const { return bIsDead; }
