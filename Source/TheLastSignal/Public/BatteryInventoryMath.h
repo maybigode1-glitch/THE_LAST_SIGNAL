@@ -27,4 +27,16 @@ namespace LastSignal
         }
         return static_cast<std::int32_t>(total);
     }
+
+    // Returns true only when the inventory count increases. Pickups must not be
+    // consumed when the inventory is already at its cap.
+    constexpr bool TryAddBatteryPacks(
+        std::int32_t current,
+        std::int32_t amount,
+        std::int32_t& updated
+    ) noexcept
+    {
+        updated = AddBatteryPacks(current, amount);
+        return updated > current;
+    }
 }
