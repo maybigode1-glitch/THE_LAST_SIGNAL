@@ -33,10 +33,16 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertIn('#include "BatteryInventoryMath.h"', source)
         self.assertIn("LastSignal::AddBatteryPacks(BatteryPacks, Amount)", source)
         self.assertNotIn("FMath::Clamp(BatteryPacks + Amount", source)
-    def test_battery_pickup_adds_inventory_and_is_consumed(self):
-        source = (ROOT / "Source/TheLastSignal/Private/SignalBatteryPickup.cpp").read_text(encoding="utf-8")
-        self.assertIn("AddBatteryPack", source)
-        self.assertIn("Destroy()", source)
+    def test_battery_pickup_is_consumed_only_after_inventory_accepts_pack(self):
+        pickup = (ROOT / "Source/TheLastSignal/Private/SignalBatteryPickup.cpp").read_text(encoding="utf-8")
+        character_header = (ROOT / "Source/TheLastSignal/Public/LastSignalCharacter.h").read_text(encoding="utf-8")
+        character = (ROOT / "Source/TheLastSignal/Private/LastSignalCharacter.cpp").read_text(encoding="utf-8")
+        self.assertIn("bool AddBatteryPack", character_header)
+        self.assertIn("LastSignal::TryAddBatteryPacks", character)
+        interaction = pickup.split("void ASignalBatteryPickup::Interact_Implementation", 1)[1]
+        self.assertIn("if (!Character->AddBatteryPack(PacksGranted)) return;", interaction)
+        self.assertLess(interaction.index("AddBatteryPack"), interaction.index("Destroy()"))
+        self.assertIn("bHasBeenActivated = true;", interaction)
     def test_signal_interactions_update_objective_progress(self):
         interactable = (ROOT / "Source/TheLastSignal/Private/SignalInteractable.cpp").read_text(encoding="utf-8")
         game_mode = (ROOT / "Source/TheLastSignal/Private/LastSignalGameMode.cpp").read_text(encoding="utf-8")
