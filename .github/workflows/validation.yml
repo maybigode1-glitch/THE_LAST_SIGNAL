@@ -31,3 +31,10 @@ jobs:
             Tests/test_battery_inventory.cpp \
             -o /tmp/test_battery_inventory
           /tmp/test_battery_inventory
+      - name: Compile and run Stalker melee rules regression tests
+        run: |
+          g++ -std=c++17 -Wall -Wextra -Werror -pedantic \
+            -I Source/TheLastSignal/Public \
+            Tests/test_stalker_melee_rules.cpp \
+            -o /tmp/test_stalker_melee_rules
+          /tmp/test_stalker_melee_rules
