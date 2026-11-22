@@ -11,7 +11,8 @@
 - [x] GameMode objective counter and configurable target (default 3).
 - [x] Native C++ survival HUD source for flashlight, inventory, health, objectives, and reticle.
 - [x] Stalker AI source for patrol, sight detection, pursuit, search, and melee attacks.
-- [x] Melee attack wind-up: damage is delayed to an impact window and cancelled by player movement out of range/line of sight.
+- [x] Melee attack wind-up: impact rechecks range and line of sight, and requires a valid AI controller before damage can be applied.
+- [x] Standalone C++ regression cases for Stalker melee impact range, controller possession, line of sight, and non-finite inputs.
 - [x] Visible cube placeholder for the stalker when no skeletal mesh is assigned.
 - [x] Player health, damage, death state, and HUD health display.
 - [x] Animation instance state and montage hooks for the stalker.
@@ -31,7 +32,7 @@
 - [x] Offline tests for the map builder INI helper: update existing keys while preserving unrelated settings, create a missing section, and repeat updates idempotently.
 
 ## Automated validation
-- [x] GitHub Actions workflow runs repository metadata validation, the complete Python unit-test suite (including map-builder preflight/cleanup regressions), and the standalone battery inventory C++ regression executable (16 cases). See the latest checks on [PR #2](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/pull/2).
+- [x] GitHub Actions workflow runs repository metadata validation, the complete Python unit-test suite, the standalone battery inventory C++ regression executable (16 cases), and the standalone Stalker melee rules C++ regression executable (8 cases). See the latest checks on [PR #2](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/pull/2).
 
 ## Validation still pending
 - [ ] Run `Scripts/qa_relay_station.py` inside Unreal Editor after generating the map; inspect `Saved/RelayStation01_QA.json`.
@@ -44,4 +45,4 @@
 - [ ] Assign skeletal mesh, Animation Blueprint, attack montage, and audio assets; test in runtime.
 - [ ] Produce Windows packaged build and perform gameplay QA.
 
-The offline Editor-QA unit tests use a small Unreal Python API double to test the script's report/pass/fail behavior; they do not execute Unreal Editor. The map-builder preflight tests use the same limited approach to check failure ordering and cleanup error handling, not actual level operations. The standalone battery inventory test compiles and executes the exact arithmetic header included by the character source, but does not compile the Unreal module. The INI-helper tests use standard-library temporary files and do not execute Unreal Editor. Repository checks do not prove Unreal compilation, editor startup, map generation, runtime behavior, or packaging.
+The offline Editor-QA unit tests use a small Unreal Python API double to test the script's report/pass/fail behavior; they do not execute Unreal Editor. The map-builder preflight tests use the same limited approach to check failure ordering and cleanup error handling, not actual level operations. The standalone battery inventory and Stalker melee rules tests compile and execute pure C++ headers used by the game source, but do not compile the Unreal module. The INI-helper tests use standard-library temporary files and do not execute Unreal Editor. Repository checks do not prove Unreal compilation, editor startup, map generation, runtime behavior, or packaging.
