@@ -12,7 +12,7 @@
 - [x] Native C++ survival HUD source for flashlight, inventory, health, objectives, and reticle.
 - [x] Stalker AI source for patrol, sight detection, pursuit, search, and melee attacks.
 - [x] Melee attack wind-up: impact rechecks range and line of sight, and requires a valid AI controller before damage can be applied.
-- [x] Standalone C++ regression cases for Stalker melee impact range, controller possession, line of sight, and non-finite inputs.
+- [x] Standalone C++ regression cases for Stalker melee range boundaries, controller possession, line of sight, and rejection of negative or non-finite geometry inputs (14 cases).
 - [x] Visible cube placeholder for the stalker when no skeletal mesh is assigned.
 - [x] Player health, damage, death state, and HUD health display.
 - [x] Animation instance state and montage hooks for the stalker.
@@ -32,7 +32,7 @@
 - [x] Offline tests for the map builder INI helper: update existing keys while preserving unrelated settings, create a missing section, and repeat updates idempotently.
 
 ## Automated validation
-- [x] GitHub Actions workflow runs repository metadata validation, the complete Python unit-test suite, the standalone battery inventory C++ regression executable (16 cases), and the standalone Stalker melee rules C++ regression executable (8 cases). See the latest checks on [PR #2](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/pull/2).
+- [x] GitHub Actions workflow runs repository metadata validation, the complete Python unit-test suite, the standalone battery inventory C++ regression executable (16 cases), and the standalone Stalker melee rules C++ regression executable (14 cases). See the latest checks on [PR #2](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/pull/2).
 
 ## Validation still pending
 - [ ] Run `Scripts/qa_relay_station.py` inside Unreal Editor after generating the map; inspect `Saved/RelayStation01_QA.json`.
