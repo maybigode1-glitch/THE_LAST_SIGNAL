@@ -10,7 +10,7 @@ namespace
     {
         if (actual != expected)
         {
-            std::cerr << name << ": expected " << expected << ", got " << actual << '\\n';
+            std::cerr << name << ": expected " << expected << ", got " << actual << '\n';
             std::exit(EXIT_FAILURE);
         }
     }
@@ -36,6 +36,6 @@ int main()
     Expect("negative infinite distance cancels impact", CanApplyStalkerMeleeDamage(-std::numeric_limits<float>::infinity(), 150.0f, true, true, true), false);
     Expect("negative infinite attack range cancels impact", CanApplyStalkerMeleeDamage(0.0f, -std::numeric_limits<float>::infinity(), true, true, true), false);
 
-    std::cout << "Stalker melee impact rules: 15 cases passed\\n";
+    std::cout << "Stalker melee impact rules: 15 cases passed\n";
     return EXIT_SUCCESS;
 }
