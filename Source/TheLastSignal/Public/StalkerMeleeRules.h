@@ -9,11 +9,12 @@ namespace LastSignal
     inline bool CanApplyStalkerMeleeDamage(
         float distance,
         float attackRange,
+        bool attackIsActive,
         bool hasAIController,
         bool hasLineOfSight
     ) noexcept
     {
-        if (!hasAIController || !hasLineOfSight ||
+        if (!attackIsActive || !hasAIController || !hasLineOfSight ||
             !std::isfinite(distance) || !std::isfinite(attackRange) ||
             distance < 0.0f || attackRange < 0.0f)
         {
