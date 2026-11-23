@@ -9,7 +9,7 @@ GitHub Actions uses a GitHub-hosted Ubuntu runner for checks that do not require
 - `Scripts/validate_project.py` checks the project descriptor, required repository files, and basic Unreal project metadata.
 - `python -m unittest discover -s Tests -v` runs the complete Python regression suite. This includes project metadata checks, INI-helper behavior, mocked Unreal Editor QA behavior, the map-builder/QA actor contract, and map-builder preflight/cleanup contracts. These Python checks do not execute Unreal Editor.
 - A standalone C++17 executable compiles the exact `BatteryInventoryMath.h` header included by the character source, with `-Wall -Wextra -Werror -pedantic`, and runs 16 battery-inventory arithmetic and pickup-acceptance cases.
-- A second standalone C++17 executable compiles `StalkerMeleeRules.h` with the same warning policy and runs 14 impact-predicate cases covering range boundaries, controller possession, line of sight, and invalid negative/non-finite geometry inputs.
+- A second standalone C++17 executable compiles `StalkerMeleeRules.h` with the same warning policy and runs 15 impact-predicate cases covering active attack state, range boundaries, controller possession, line of sight, and invalid negative/non-finite geometry inputs.
 
 These standalone C++ tests validate isolated pure-helper contracts only. They do not compile the Unreal module or exercise Unreal reflection, gameplay, or Blueprint integration.
 
