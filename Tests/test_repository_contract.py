@@ -81,7 +81,7 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertIn('#include "StalkerMeleeRules.h"', source)
         self.assertIn("const bool bHasLineOfSight = bHasAIController && AI->LineOfSightTo(Player);", impact)
         self.assertIn(
-            "LastSignal::CanApplyStalkerMeleeDamage(Distance, AttackRange, bHasAIController, bHasLineOfSight)",
+            "LastSignal::CanApplyStalkerMeleeDamage(Distance, AttackRange, bIsAttacking, bHasAIController, bHasLineOfSight)",
             impact
         )
         self.assertLess(impact.index("CanApplyStalkerMeleeDamage"), impact.index("Player->TakeDamage"))
