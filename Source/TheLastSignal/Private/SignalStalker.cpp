@@ -231,7 +231,7 @@ void ASignalStalker::ApplyAttackDamage()
     AAIController* AI = Cast<AAIController>(GetController());
     const bool bHasAIController = AI != nullptr;
     const bool bHasLineOfSight = bHasAIController && AI->LineOfSightTo(Player);
-    if (!LastSignal::CanApplyStalkerMeleeDamage(Distance, AttackRange, bHasAIController, bHasLineOfSight)) return;
+    if (!LastSignal::CanApplyStalkerMeleeDamage(Distance, AttackRange, bIsAttacking, bHasAIController, bHasLineOfSight)) return;
 
     Player->TakeDamage(AttackDamage, FDamageEvent(), AI, this);
 }
