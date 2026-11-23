@@ -1,6 +1,5 @@
 #include "StalkerMeleeRules.h"
 
-#include <cmath>
 #include <cstdlib>
 #include <iostream>
 #include <limits>
@@ -29,7 +28,13 @@ int main()
     Expect("missing controller and line of sight cancels impact", CanApplyStalkerMeleeDamage(120.0f, 150.0f, false, false), false);
     Expect("NaN distance cancels impact", CanApplyStalkerMeleeDamage(std::numeric_limits<float>::quiet_NaN(), 150.0f, true, true), false);
     Expect("NaN attack range cancels impact", CanApplyStalkerMeleeDamage(120.0f, std::numeric_limits<float>::quiet_NaN(), true, true), false);
+    Expect("negative distance cancels impact", CanApplyStalkerMeleeDamage(-0.01f, 150.0f, true, true), false);
+    Expect("negative attack range cancels impact", CanApplyStalkerMeleeDamage(0.0f, -1.0f, true, true), false);
+    Expect("positive infinite distance cancels impact", CanApplyStalkerMeleeDamage(std::numeric_limits<float>::infinity(), 150.0f, true, true), false);
+    Expect("positive infinite attack range cancels impact", CanApplyStalkerMeleeDamage(120.0f, std::numeric_limits<float>::infinity(), true, true), false);
+    Expect("negative infinite distance cancels impact", CanApplyStalkerMeleeDamage(-std::numeric_limits<float>::infinity(), 150.0f, true, true), false);
+    Expect("negative infinite attack range cancels impact", CanApplyStalkerMeleeDamage(0.0f, -std::numeric_limits<float>::infinity(), true, true), false);
 
-    std::cout << "Stalker melee impact rules: 8 cases passed\n";
+    std::cout << "Stalker melee impact rules: 14 cases passed\n";
     return EXIT_SUCCESS;
 }
