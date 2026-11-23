@@ -12,7 +12,7 @@
 - [x] Native C++ survival HUD source for flashlight, inventory, health, objectives, and reticle.
 - [x] Stalker AI source for patrol, sight detection, pursuit, search, and melee attacks.
 - [x] Melee attack wind-up: impact requires the attack state to remain active and rechecks range and line of sight with a valid AI controller before damage can be applied.
-- [x] Standalone C++ regression cases for Stalker melee range boundaries, controller possession, line of sight, and rejection of negative or non-finite geometry inputs, and cancellation after the attack state expires (15 cases).
+- [x] Standalone C++ regression cases for Stalker melee range boundaries, controller possession, line of sight, invalid geometry, and expired attack-state cancellation (15 cases).
 - [x] Visible cube placeholder for the stalker when no skeletal mesh is assigned.
 - [x] Player health, damage, death state, and HUD health display.
 - [x] Animation instance state and montage hooks for the stalker.
