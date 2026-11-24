@@ -40,16 +40,35 @@ def run_qa():
     actors = unreal.EditorLevelLibrary.get_all_level_actors()
     counts = {}
     generated_actor_classes = {}
+    inspection_errors = []
 
-    for actor in actors:
-        class_name = actor.get_class().get_name()
+    for actor_index, actor in enumerate(actors):
+        try:
+            class_name = actor.get_class().get_name()
+        except Exception as exc:
+            inspection_errors.append({
+                "actor_index": actor_index,
+                "stage": "class",
+                "error": type(exc).__name__ + ": " + str(exc),
+            })
+            continue
+
         counts[class_name] = counts.get(class_name, 0) + 1
+
         try:
             label = actor.get_actor_label()
-            if label.startswith(GENERATED_PREFIX):
-                generated_actor_classes.setdefault(label, []).append(class_name)
-        except Exception:
-            pass
+            if not isinstance(label, str):
+                raise TypeError("get_actor_label() did not return a string")
+        except Exception as exc:
+            inspection_errors.append({
+                "actor_index": actor_index,
+                "stage": "label",
+                "error": type(exc).__name__ + ": " + str(exc),
+            })
+            continue
+
+        if label.startswith(GENERATED_PREFIX):
+            generated_actor_classes.setdefault(label, []).append(class_name)
 
     generated_labels = sorted(
         label
@@ -79,6 +98,7 @@ def run_qa():
     }
     checks = {
         "correct_map_open": package == EXPECTED_MAP,
+        "all_actors_inspectable": not inspection_errors,
         "player_start": counts.get("PlayerStart", 0) >= 1,
         "navmesh_bounds_volume": counts.get("NavMeshBoundsVolume", 0) >= 1,
         "three_signal_terminals": counts.get("SignalInteractable", 0) >= 3,
@@ -94,6 +114,7 @@ def run_qa():
         "expected_map": EXPECTED_MAP,
         "actor_count": len(actors),
         "class_counts": counts,
+        "actor_inspection_errors": inspection_errors,
         "generated_actor_labels": generated_labels,
         "generated_actor_classes": {
             label: sorted(class_names)
@@ -116,6 +137,8 @@ def run_qa():
 
     for name, passed in checks.items():
         log(("PASS" if passed else "FAIL") + ": " + name)
+    if inspection_errors:
+        log("Actor inspection errors: " + json.dumps(inspection_errors, sort_keys=True))
     if missing_generated_labels:
         log("Missing generated actors: " + ", ".join(missing_generated_labels))
     if duplicate_generated_labels:
