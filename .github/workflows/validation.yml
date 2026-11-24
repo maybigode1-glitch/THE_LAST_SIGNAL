@@ -40,3 +40,11 @@ jobs:
             Tests/test_stalker_melee_rules.cpp \
             -o /tmp/test_stalker_melee_rules
           /tmp/test_stalker_melee_rules
+      - name: Compile and run survival health C++ regression tests with UBSan
+        run: |
+          g++ -std=c++17 -Wall -Wextra -Werror -pedantic \
+            -fsanitize=undefined -fno-sanitize-recover=undefined \
+            -I Source/TheLastSignal/Public \
+            Tests/test_survival_health_math.cpp \
+            -o /tmp/test_survival_health_math
+          /tmp/test_survival_health_math

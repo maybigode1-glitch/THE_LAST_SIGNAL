@@ -10,6 +10,8 @@
 - [x] Standalone native C++ regression cases for ordinary additions, cap behavior, accepted/rejected pickup additions, non-positive amounts, and int32 boundary values.
 - [x] GameMode objective counter and configurable target (default 3).
 - [x] Native C++ survival HUD source for flashlight, inventory, health, objectives, and reticle.
+- [x] Player health rejects non-finite/non-positive damage before the engine damage handler and applies finite damage through a shared pure C++ health helper.
+- [x] Standalone C++ regression cases for ordinary, fractional, lethal, overkill, non-positive, NaN, infinite, and invalid current-health inputs (13 cases).
 - [x] Stalker AI source for patrol, sight detection, pursuit, search, and melee attacks.
 - [x] Melee attack wind-up: impact requires the attack state to remain active and rechecks range and line of sight with a valid AI controller before damage can be applied.
 - [x] Standalone C++ regression cases for Stalker melee range boundaries, controller possession, line of sight, invalid geometry, and expired attack-state cancellation (15 cases).
@@ -32,7 +34,7 @@
 - [x] Offline tests for the map builder INI helper: update existing keys while preserving unrelated settings, create a missing section, and repeat updates idempotently.
 
 ## Automated validation
-- [x] GitHub Actions workflow runs repository metadata validation, the complete Python unit-test suite, the standalone battery inventory C++ regression executable (16 cases), and the standalone Stalker melee rules C++ regression executable (15 cases). See the latest checks on [PR #2](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/pull/2).
+- [x] GitHub Actions workflow runs repository metadata validation, the complete Python unit-test suite, the standalone battery inventory C++ regression executable (16 cases), the standalone Stalker melee rules C++ regression executable (15 cases), and the survival health C++ regression executable (13 cases). See the latest checks on [PR #2](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/pull/2).
 
 ## Validation still pending
 - [ ] Run `Scripts/qa_relay_station.py` inside Unreal Editor after generating the map; inspect `Saved/RelayStation01_QA.json`.
@@ -45,4 +47,4 @@
 - [ ] Assign skeletal mesh, Animation Blueprint, attack montage, and audio assets; test in runtime.
 - [ ] Produce Windows packaged build and perform gameplay QA.
 
-The offline Editor-QA unit tests use a small Unreal Python API double to test the script's report/pass/fail behavior; they do not execute Unreal Editor. The map-builder preflight tests use the same limited approach to check failure ordering and cleanup error handling, not actual level operations. The standalone battery inventory and Stalker melee rules tests compile and execute pure C++ headers used by the game source, but do not compile the Unreal module. The INI-helper tests use standard-library temporary files and do not execute Unreal Editor. Repository checks do not prove Unreal compilation, editor startup, map generation, runtime behavior, or packaging.
+The offline Editor-QA unit tests use a small Unreal Python API double to test the script's report/pass/fail behavior; they do not execute Unreal Editor. The map-builder preflight tests use the same limited approach to check failure ordering and cleanup error handling, not actual level operations. The standalone battery inventory, Stalker melee rules, and survival health tests compile and execute pure C++ headers used by the game source, but do not compile the Unreal module. The INI-helper tests use standard-library temporary files and do not execute Unreal Editor. Repository checks do not prove Unreal compilation, editor startup, map generation, runtime behavior, or packaging.

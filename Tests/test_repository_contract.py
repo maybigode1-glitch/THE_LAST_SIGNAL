@@ -72,7 +72,6 @@ class RepositoryContractTests(unittest.TestCase):
         impact = source.split("void ASignalStalker::ApplyAttackDamage()", 1)[1].split(
             "void ASignalStalker::ClearAttackState()", 1
         )[0]
-
         self.assertIn("&ASignalStalker::ApplyAttackDamage", attack)
         self.assertIn("AttackImpactDelay", attack)
         self.assertIn("AttackMontage->GetPlayLength() * 0.35f", attack)
@@ -93,6 +92,23 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertIn("bIsDead", character)
         self.assertIn("GetHealthPercent", hud)
         self.assertIn("HEALTH", hud)
+    def test_player_rejects_invalid_damage_before_super_and_uses_shared_health_math(self):
+        source = (ROOT / "Source/TheLastSignal/Private/LastSignalCharacter.cpp").read_text(encoding="utf-8")
+        self.assertIn('#include "SurvivalHealthMath.h"', source)
+        damage = source.split("float ALastSignalCharacter::TakeDamage", 1)[1].split(
+            "\nvoid ALastSignalCharacter::SetupPlayerInputComponent", 1
+        )[0]
+        self.assertLess(
+            damage.index("IsValidDamageAmount(DamageAmount)"),
+            damage.index("Super::TakeDamage")
+        )
+        self.assertIn(
+            "TryApplyDamageToHealth(Health, AppliedDamage, UpdatedHealth)", damage
+        )
+        self.assertLess(
+            damage.index("TryApplyDamageToHealth"),
+            damage.index("Health = UpdatedHealth")
+        )
     def test_stalker_animation_state_and_montage_hooks(self):
         header = (ROOT / "Source/TheLastSignal/Public/SignalStalkerAnimInstance.h").read_text(encoding="utf-8")
         source = (ROOT / "Source/TheLastSignal/Private/SignalStalkerAnimInstance.cpp").read_text(encoding="utf-8")
@@ -127,7 +143,6 @@ class RepositoryContractTests(unittest.TestCase):
         for token in ("get_editor_world", "PlayerStart", "NavMeshBoundsVolume", "SignalInteractable", "SignalBatteryPickup", "SignalStalker", "RelayStation01_QA.json", "all(checks.values())"):
             self.assertIn(token, source)
         compile(source, "qa_relay_station.py", "exec")
-
     def test_missing_source_file_is_reported(self):
         import tempfile
         with tempfile.TemporaryDirectory() as tmp:

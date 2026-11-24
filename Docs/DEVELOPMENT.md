@@ -10,8 +10,9 @@ GitHub Actions uses a GitHub-hosted Ubuntu runner for checks that do not require
 - `python -m unittest discover -s Tests -v` runs the complete Python regression suite. This includes project metadata checks, INI-helper behavior, mocked Unreal Editor QA behavior (including fail-closed reporting when an actor class or label cannot be inspected), the map-builder/QA actor contract, and map-builder preflight/cleanup contracts. These Python checks do not execute Unreal Editor.
 - A standalone C++17 executable compiles the exact `BatteryInventoryMath.h` header included by the character source, with `-Wall -Wextra -Werror -pedantic -fsanitize=undefined -fno-sanitize-recover=undefined`, and runs 16 battery-inventory arithmetic and accepted/rejected pickup cases.
 - A second standalone C++17 executable compiles `StalkerMeleeRules.h` with the same warning and UndefinedBehaviorSanitizer policy and runs 15 impact-predicate cases covering active attack state, range boundaries, controller possession, line of sight, and invalid negative/non-finite geometry inputs.
+- A third standalone C++17 executable compiles `SurvivalHealthMath.h`, also with UndefinedBehaviorSanitizer, and runs 13 cases for ordinary, fractional, lethal, overkill, non-positive, NaN, infinite, and invalid current-health inputs.
 
-UndefinedBehaviorSanitizer is enabled for both native regression executables so undefined behavior detected during a test terminates the CI step instead of being silently recovered.
+UndefinedBehaviorSanitizer is enabled for all native regression executables so undefined behavior detected during a test terminates the CI step instead of being silently recovered.
 
 These standalone C++ tests validate isolated pure-helper contracts only. They do not compile the Unreal module or exercise Unreal reflection, gameplay, or Blueprint integration.
 
@@ -46,6 +47,13 @@ Compile and run the isolated Stalker melee rules test with GCC and UndefinedBeha
 ```bash
 g++ -std=c++17 -Wall -Wextra -Werror -pedantic -fsanitize=undefined -fno-sanitize-recover=undefined -I Source/TheLastSignal/Public Tests/test_stalker_melee_rules.cpp -o test_stalker_melee_rules
 ./test_stalker_melee_rules
+```
+
+Compile and run the isolated survival health rules test with GCC and UndefinedBehaviorSanitizer:
+
+```bash
+g++ -std=c++17 -Wall -Wextra -Werror -pedantic -fsanitize=undefined -fno-sanitize-recover=undefined -I Source/TheLastSignal/Public Tests/test_survival_health_math.cpp -o test_survival_health_math
+./test_survival_health_math
 ```
 
 ## Future Unreal validation

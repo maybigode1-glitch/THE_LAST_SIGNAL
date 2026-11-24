@@ -1,5 +1,6 @@
 #include "LastSignalCharacter.h"
 #include "BatteryInventoryMath.h"
+#include "SurvivalHealthMath.h"
 #include "SignalInteractable.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
@@ -51,9 +52,13 @@ void ALastSignalCharacter::Tick(float DeltaSeconds)
 }
 float ALastSignalCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+    if (!LastSignal::IsValidDamageAmount(DamageAmount)) return 0.0f;
+
     const float AppliedDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-    if (bIsDead || AppliedDamage <= 0.0f) return 0.0f;
-    Health = FMath::Max(0.0f, Health - AppliedDamage);
+    float UpdatedHealth = Health;
+    if (bIsDead || !LastSignal::TryApplyDamageToHealth(Health, AppliedDamage, UpdatedHealth)) return 0.0f;
+
+    Health = UpdatedHealth;
     if (Health <= 0.0f)
     {
         bIsDead = true;
