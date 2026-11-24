@@ -26,7 +26,7 @@
 - [x] First-area automation guide and repository validator/test coverage.
 - [x] Unreal Editor structural QA script for the generated Relay Station map, with a JSON report and explicit pass/fail checks.
 - [x] Offline unit tests for the Editor QA report logic: passing actor set, missing stalker, wrong map, and missing required generated labels.
-- [x] Offline QA regression tests for duplicate generated labels and required labels assigned to unexpected actor classes, including cases where aggregate class counts still match.
+- [x] Offline QA regression tests for duplicate generated labels, required labels assigned to unexpected actor classes, and actor class/label inspection failures; all failures are recorded in the JSON report.
 - [x] AST-based contract test verifies that the map builder creates exactly the eight QA-required generated actors with their expected Unreal class names.
 - [x] Offline map-builder preflight tests verify missing assets/classes abort before level mutation, failed generated-actor deletion is surfaced, and startup settings are written after save calls.
 - [x] Offline tests for the map builder INI helper: update existing keys while preserving unrelated settings, create a missing section, and repeat updates idempotently.
