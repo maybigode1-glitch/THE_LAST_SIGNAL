@@ -30,7 +30,7 @@ The environment uses Unreal's built-in Engine BasicShapes cube; no imported envi
 
 ## Automated editor QA
 
-After generating and opening the map, run `Scripts/qa_relay_station.py` through **Tools > Execute Python Script**. It checks that the expected map is open and that the editor world contains at least one PlayerStart, one NavMeshBoundsVolume, three SignalInteractable actors, two SignalBatteryPickup actors, and one SignalStalker. It writes a JSON report to `Saved/RelayStation01_QA.json` and raises an error if any structural check fails.
+After generating and opening the map, run `Scripts/qa_relay_station.py` through **Tools > Execute Python Script**. It checks that the expected map is open and that the editor world contains at least one PlayerStart, one NavMeshBoundsVolume, three SignalInteractable actors, two SignalBatteryPickup actors, and one SignalStalker. It writes a JSON report to `Saved/RelayStation01_QA.json`, fails if any actor class or label cannot be inspected, and raises an error if any structural check fails.
 
 This is a structural check only. It does not prove that navigation has built correctly, actors have usable collision, interactions work, AI can reach the player, C++ compiles, or the packaged game runs.
 
