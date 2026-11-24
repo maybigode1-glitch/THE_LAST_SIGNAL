@@ -7,8 +7,8 @@ GitHub Actions uses a GitHub-hosted Ubuntu runner for checks that do not require
 ## What CI verifies
 
 - `Scripts/validate_project.py` checks the project descriptor, required repository files, and basic Unreal project metadata.
-- `python -m unittest discover -s Tests -v` runs the complete Python regression suite. This includes project metadata checks, INI-helper behavior, mocked Unreal Editor QA behavior, the map-builder/QA actor contract, and map-builder preflight/cleanup contracts. These Python checks do not execute Unreal Editor.
-- A standalone C++17 executable compiles the exact `BatteryInventoryMath.h` header included by the character source, with `-Wall -Wextra -Werror -pedantic -fsanitize=undefined -fno-sanitize-recover=undefined`, and runs 16 battery-inventory arithmetic and pickup-acceptance cases.
+- `python -m unittest discover -s Tests -v` runs the complete Python regression suite. This includes project metadata checks, INI-helper behavior, mocked Unreal Editor QA behavior (including fail-closed reporting when an actor class or label cannot be inspected), the map-builder/QA actor contract, and map-builder preflight/cleanup contracts. These Python checks do not execute Unreal Editor.
+- A standalone C++17 executable compiles the exact `BatteryInventoryMath.h` header included by the character source, with `-Wall -Wextra -Werror -pedantic -fsanitize=undefined -fno-sanitize-recover=undefined`, and runs 16 battery-inventory arithmetic and accepted/rejected pickup cases.
 - A second standalone C++17 executable compiles `StalkerMeleeRules.h` with the same warning and UndefinedBehaviorSanitizer policy and runs 15 impact-predicate cases covering active attack state, range boundaries, controller possession, line of sight, and invalid negative/non-finite geometry inputs.
 
 UndefinedBehaviorSanitizer is enabled for both native regression executables so undefined behavior detected during a test terminates the CI step instead of being silently recovered.
