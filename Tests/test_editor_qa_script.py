@@ -37,14 +37,20 @@ class _Name:
 
 
 class _Actor:
-    def __init__(self, class_name, label=""):
+    def __init__(self, class_name, label="", class_error=None, label_error=None):
         self.class_name = class_name
         self.label = label
+        self.class_error = class_error
+        self.label_error = label_error
 
     def get_class(self):
+        if self.class_error:
+            raise RuntimeError(self.class_error)
         return _Name(self.class_name)
 
     def get_actor_label(self):
+        if self.label_error:
+            raise RuntimeError(self.label_error)
         return self.label
 
 
@@ -80,6 +86,9 @@ class EditorQAScriptTests(unittest.TestCase):
         )
         _FAKE_UNREAL.log = lambda _message: None
 
+    def report_path(self):
+        return Path(self.temp_dir.name) / "RelayStation01_QA.json"
+
     def test_expected_map_and_actor_set_produce_passing_json_report(self):
         report = _MODULE.run_qa()
         self.assertTrue(report["passed"])
@@ -89,17 +98,15 @@ class EditorQAScriptTests(unittest.TestCase):
         self.assertEqual(report["missing_generated_labels"], [])
         self.assertEqual(report["duplicate_generated_labels"], [])
         self.assertEqual(report["wrong_generated_actor_classes"], {})
-        report_path = Path(self.temp_dir.name) / "RelayStation01_QA.json"
-        self.assertTrue(report_path.is_file())
-        saved = json.loads(report_path.read_text(encoding="utf-8"))
+        self.assertEqual(report["actor_inspection_errors"], [])
+        saved = json.loads(self.report_path().read_text(encoding="utf-8"))
         self.assertEqual(saved, report)
 
     def test_missing_required_actor_fails_and_still_writes_report(self):
         self.actors = [actor for actor in self.actors if actor.class_name != "SignalStalker"]
         with self.assertRaisesRegex(RuntimeError, "stalker_ai"):
             _MODULE.run_qa()
-        report_path = Path(self.temp_dir.name) / "RelayStation01_QA.json"
-        saved = json.loads(report_path.read_text(encoding="utf-8"))
+        saved = json.loads(self.report_path().read_text(encoding="utf-8"))
         self.assertFalse(saved["passed"])
         self.assertFalse(saved["checks"]["stalker_ai"])
 
@@ -107,16 +114,14 @@ class EditorQAScriptTests(unittest.TestCase):
         self.world = _World("/Game/Maps/AnotherMap")
         with self.assertRaisesRegex(RuntimeError, "correct_map_open"):
             _MODULE.run_qa()
-        report_path = Path(self.temp_dir.name) / "RelayStation01_QA.json"
-        saved = json.loads(report_path.read_text(encoding="utf-8"))
+        saved = json.loads(self.report_path().read_text(encoding="utf-8"))
         self.assertFalse(saved["checks"]["correct_map_open"])
 
     def test_wrong_terminal_labels_fail_even_when_class_counts_match(self):
         self.actors[2] = _Actor("SignalInteractable", "RS01_AUTO_DecoyTerminal")
         with self.assertRaisesRegex(RuntimeError, "required_generated_actors"):
             _MODULE.run_qa()
-        report_path = Path(self.temp_dir.name) / "RelayStation01_QA.json"
-        saved = json.loads(report_path.read_text(encoding="utf-8"))
+        saved = json.loads(self.report_path().read_text(encoding="utf-8"))
         self.assertEqual(saved["class_counts"]["SignalInteractable"], 3)
         self.assertFalse(saved["checks"]["required_generated_actors"])
         self.assertEqual(saved["missing_generated_labels"], ["RS01_AUTO_TerminalA"])
@@ -125,8 +130,7 @@ class EditorQAScriptTests(unittest.TestCase):
         self.actors.append(_Actor("SignalInteractable", "RS01_AUTO_TerminalA"))
         with self.assertRaisesRegex(RuntimeError, "unique_generated_actor_labels"):
             _MODULE.run_qa()
-        report_path = Path(self.temp_dir.name) / "RelayStation01_QA.json"
-        saved = json.loads(report_path.read_text(encoding="utf-8"))
+        saved = json.loads(self.report_path().read_text(encoding="utf-8"))
         self.assertTrue(saved["checks"]["required_generated_actors"])
         self.assertFalse(saved["checks"]["unique_generated_actor_labels"])
         self.assertEqual(saved["duplicate_generated_labels"], ["RS01_AUTO_TerminalA"])
@@ -136,8 +140,7 @@ class EditorQAScriptTests(unittest.TestCase):
         self.actors.append(_Actor("SignalInteractable", "RS01_AUTO_ExtraTerminal"))
         with self.assertRaisesRegex(RuntimeError, "required_generated_actor_classes"):
             _MODULE.run_qa()
-        report_path = Path(self.temp_dir.name) / "RelayStation01_QA.json"
-        saved = json.loads(report_path.read_text(encoding="utf-8"))
+        saved = json.loads(self.report_path().read_text(encoding="utf-8"))
         self.assertEqual(saved["class_counts"]["SignalInteractable"], 3)
         self.assertTrue(saved["checks"]["required_generated_actors"])
         self.assertFalse(saved["checks"]["required_generated_actor_classes"])
@@ -150,6 +153,49 @@ class EditorQAScriptTests(unittest.TestCase):
                 }
             },
         )
+
+    def test_unreadable_actor_label_fails_and_is_recorded_in_report(self):
+        self.actors[0] = _Actor(
+            "PlayerStart",
+            "RS01_AUTO_PlayerStart_WestEntrance",
+            label_error="label API unavailable",
+        )
+        with self.assertRaisesRegex(RuntimeError, "all_actors_inspectable"):
+            _MODULE.run_qa()
+        saved = json.loads(self.report_path().read_text(encoding="utf-8"))
+        self.assertFalse(saved["checks"]["all_actors_inspectable"])
+        self.assertEqual(
+            saved["actor_inspection_errors"],
+            [{
+                "actor_index": 0,
+                "stage": "label",
+                "error": "RuntimeError: label API unavailable",
+            }],
+        )
+        self.assertIn(
+            "RS01_AUTO_PlayerStart_WestEntrance",
+            saved["missing_generated_labels"],
+        )
+
+    def test_unreadable_actor_class_fails_and_is_recorded_in_report(self):
+        self.actors[0] = _Actor(
+            "PlayerStart",
+            "RS01_AUTO_PlayerStart_WestEntrance",
+            class_error="class API unavailable",
+        )
+        with self.assertRaisesRegex(RuntimeError, "all_actors_inspectable"):
+            _MODULE.run_qa()
+        saved = json.loads(self.report_path().read_text(encoding="utf-8"))
+        self.assertFalse(saved["checks"]["all_actors_inspectable"])
+        self.assertEqual(
+            saved["actor_inspection_errors"],
+            [{
+                "actor_index": 0,
+                "stage": "class",
+                "error": "RuntimeError: class API unavailable",
+            }],
+        )
+        self.assertNotIn("PlayerStart", saved["class_counts"])
 
 
 if __name__ == "__main__":
