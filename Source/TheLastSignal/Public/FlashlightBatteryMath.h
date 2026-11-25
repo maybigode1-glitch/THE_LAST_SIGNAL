@@ -47,26 +47,30 @@ namespace LastSignal
     }
 
     // A pack is consumed only when a finite positive charge actually increases
-    // the normalized battery value.
+    // the normalized battery value. The output may alias currentBattery.
     inline bool TryRechargeFlashlightBattery(
         float currentBattery,
         float charge,
         float& updatedBattery
     ) noexcept
     {
-        updatedBattery = ClampFlashlightBattery(currentBattery);
-        if (!std::isfinite(currentBattery) ||
+        // Snapshot inputs before writing the output so aliasing is well-defined.
+        const bool hasFiniteCurrentBattery = std::isfinite(currentBattery);
+        const float normalizedBattery = ClampFlashlightBattery(currentBattery);
+        updatedBattery = normalizedBattery;
+
+        if (!hasFiniteCurrentBattery ||
             !std::isfinite(charge) ||
             charge <= 0.0f ||
-            updatedBattery >= MaxFlashlightBattery)
+            normalizedBattery >= MaxFlashlightBattery)
         {
             return false;
         }
 
-        const float room = MaxFlashlightBattery - updatedBattery;
+        const float room = MaxFlashlightBattery - normalizedBattery;
         updatedBattery = charge >= room
             ? MaxFlashlightBattery
-            : updatedBattery + charge;
-        return updatedBattery > ClampFlashlightBattery(currentBattery);
+            : normalizedBattery + charge;
+        return updatedBattery > normalizedBattery;
     }
 }
