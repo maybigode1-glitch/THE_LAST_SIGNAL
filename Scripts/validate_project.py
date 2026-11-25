@@ -11,6 +11,8 @@ REQUIRED_FILES = (
     "Source/TheLastSignal/TheLastSignal.Build.cs", "Source/TheLastSignal/Private/TheLastSignal.cpp",
     "Source/TheLastSignal/Public/LastSignalCharacter.h", "Source/TheLastSignal/Private/LastSignalCharacter.cpp",
     "Source/TheLastSignal/Public/BatteryInventoryMath.h", "Source/TheLastSignal/Public/SurvivalHealthMath.h",
+    "Source/TheLastSignal/Public/FlashlightBatteryMath.h",
+    "Tests/test_flashlight_battery_math.cpp",
     "Source/TheLastSignal/Public/SignalInteractable.h", "Source/TheLastSignal/Private/SignalInteractable.cpp",
     "Source/TheLastSignal/Public/SignalBatteryPickup.h", "Source/TheLastSignal/Private/SignalBatteryPickup.cpp",
     "Source/TheLastSignal/Public/LastSignalGameMode.h", "Source/TheLastSignal/Private/LastSignalGameMode.cpp",
@@ -54,7 +56,7 @@ def validate_repository(root: Path) -> list[str]:
             if mapping not in config:
                 errors.append(f"Missing input mapping: {mapping}")
     checks = {
-        "Source/TheLastSignal/Private/LastSignalCharacter.cpp": ("USpotLightComponent", "ToggleFlashlight", "FlashlightDrainPerSecond", "AddBatteryPack", "UseBatteryPack", '#include "SurvivalHealthMath.h"', "IsValidDamageAmount(DamageAmount)", "TryApplyDamageToHealth(Health, AppliedDamage, UpdatedHealth)"),
+        "Source/TheLastSignal/Private/LastSignalCharacter.cpp": ("USpotLightComponent", "ToggleFlashlight", "FlashlightDrainPerSecond", "AddBatteryPack", "UseBatteryPack", '#include "SurvivalHealthMath.h"', "IsValidDamageAmount(DamageAmount)", "TryApplyDamageToHealth(Health, AppliedDamage, UpdatedHealth)", '#include "FlashlightBatteryMath.h"', "ClampFlashlightBattery(FlashlightBattery)", "DrainFlashlightBattery(FlashlightBattery, FlashlightDrainPerSecond, DeltaSeconds)", "TryRechargeFlashlightBattery("),
         "Source/TheLastSignal/Private/SignalBatteryPickup.cpp": ("ASignalBatteryPickup", "AddBatteryPack", "Destroy()"),
         "Source/TheLastSignal/Private/LastSignalGameMode.cpp": ("RegisterSignalCollected", "AreObjectivesComplete", "ALastSignalHUD::StaticClass"),
         "Source/TheLastSignal/Private/LastSignalHUD.cpp": ("GetFlashlightBatteryPercent", "GetBatteryPackCount", "GetSignalsCollected", "GetRequiredSignals", "DrawHUD", "FLASHLIGHT", "SPARE BATTERIES", "GetHealthPercent"),
