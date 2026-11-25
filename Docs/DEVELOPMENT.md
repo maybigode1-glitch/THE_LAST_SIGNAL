@@ -11,7 +11,7 @@ GitHub Actions uses a GitHub-hosted Ubuntu runner for checks that do not require
 - A standalone C++17 executable compiles the exact `BatteryInventoryMath.h` header included by the character source, with `-Wall -Wextra -Werror -pedantic -fsanitize=undefined -fno-sanitize-recover=undefined`, and runs 16 battery-inventory arithmetic and accepted/rejected pickup cases.
 - A second standalone C++17 executable compiles `StalkerMeleeRules.h` with the same warning and UndefinedBehaviorSanitizer policy and runs 15 impact-predicate cases covering active attack state, range boundaries, controller possession, line of sight, and invalid negative/non-finite geometry inputs.
 - A third standalone C++17 executable compiles `SurvivalHealthMath.h`, also with UndefinedBehaviorSanitizer, and runs 13 cases for ordinary, fractional, lethal, overkill, non-positive, NaN, infinite, and invalid current-health inputs.
-- A fourth standalone C++17 executable compiles `FlashlightBatteryMath.h` with the same warning and UndefinedBehaviorSanitizer policy and runs 22 cases for normalization, ordinary/depleted drain, invalid time/rate values, overflow-resistant large drains, capped recharge, and rejected invalid recharge inputs.
+- A fourth standalone C++17 executable compiles `FlashlightBatteryMath.h` with the same warning and UndefinedBehaviorSanitizer policy and runs 25 cases for normalization, ordinary/depleted drain, invalid time/rate values, overflow-resistant large drains, capped recharge, rejected invalid recharge inputs, and aliased input/output behavior.
 
 UndefinedBehaviorSanitizer is enabled for all native regression executables so undefined behavior detected during a test terminates the CI step instead of being silently recovered.
 
