@@ -11,6 +11,8 @@
 - [x] GameMode objective counter and configurable target (default 3).
 - [x] Native C++ survival HUD source for flashlight, inventory, health, objectives, and reticle.
 - [x] Player health rejects non-finite/non-positive damage before the engine damage handler and applies finite damage through a shared pure C++ health helper.
+- [x] Flashlight battery values are normalized to 0..100; invalid drain/time inputs cannot corrupt charge, and invalid or ineffective recharge attempts do not consume an inventory pack.
+- [x] Standalone C++ regression cases cover flashlight battery normalization, drain, depletion, invalid/non-finite inputs, overflow-resistant large drains, and accepted/rejected recharge (22 cases).
 - [x] Standalone C++ regression cases for ordinary, fractional, lethal, overkill, non-positive, NaN, infinite, and invalid current-health inputs (13 cases).
 - [x] Stalker AI source for patrol, sight detection, pursuit, search, and melee attacks.
 - [x] Melee attack wind-up: impact requires the attack state to remain active and rechecks range and line of sight with a valid AI controller before damage can be applied.
