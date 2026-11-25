@@ -48,3 +48,11 @@ jobs:
             Tests/test_survival_health_math.cpp \
             -o /tmp/test_survival_health_math
           /tmp/test_survival_health_math
+      - name: Compile and run flashlight battery C++ regression tests with UBSan
+        run: |
+          g++ -std=c++17 -Wall -Wextra -Werror -pedantic \
+            -fsanitize=undefined -fno-sanitize-recover=undefined \
+            -I Source/TheLastSignal/Public \
+            Tests/test_flashlight_battery_math.cpp \
+            -o /tmp/test_flashlight_battery_math
+          /tmp/test_flashlight_battery_math
