@@ -43,7 +43,7 @@ class RepositoryContractTests(unittest.TestCase):
     def test_flashlight_pack_is_consumed_only_after_successful_recharge(self):
         source = (ROOT / "Source/TheLastSignal/Private/LastSignalCharacter.cpp").read_text(encoding="utf-8")
         use_battery = source.split("void ALastSignalCharacter::UseBatteryPack()", 1)[1].split(
-            "\\nvoid ALastSignalCharacter::TryInteract()", 1
+            "\nvoid ALastSignalCharacter::TryInteract()", 1
         )[0]
         self.assertIn("if (!LastSignal::TryRechargeFlashlightBattery(", use_battery)
         self.assertLess(
