@@ -34,6 +34,25 @@ namespace
         }
         ExpectFloat(name, updated, expectedBattery);
     }
+
+    void ExpectAliasedRecharge(
+        const char* name,
+        float initialBattery,
+        float charge,
+        bool expectedAccepted,
+        float expectedBattery
+    )
+    {
+        float battery = initialBattery;
+        const bool accepted = LastSignal::TryRechargeFlashlightBattery(battery, charge, battery);
+        if (accepted != expectedAccepted)
+        {
+            std::cerr << name << ": expected accepted=" << expectedAccepted
+                      << ", got " << accepted << '\n';
+            std::exit(EXIT_FAILURE);
+        }
+        ExpectFloat(name, battery, expectedBattery);
+    }
 }
 
 int main()
@@ -65,6 +84,10 @@ int main()
     ExpectRecharge("infinite charge is rejected", 20.0f, Limits::infinity(), false, 20.0f);
     ExpectRecharge("NaN current battery is rejected", Limits::quiet_NaN(), 35.0f, false, 0.0f);
 
-    std::cout << "Flashlight battery rules: 22 cases passed\n";
+    ExpectAliasedRecharge("aliased ordinary recharge", 20.0f, 35.0f, true, 55.0f);
+    ExpectAliasedRecharge("aliased full battery rejects recharge", 100.0f, 35.0f, false, 100.0f);
+    ExpectAliasedRecharge("aliased NaN battery fails closed", Limits::quiet_NaN(), 35.0f, false, 0.0f);
+
+    std::cout << "Flashlight battery rules: 25 cases passed\n";
     return EXIT_SUCCESS;
 }
