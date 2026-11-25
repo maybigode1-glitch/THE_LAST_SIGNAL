@@ -50,6 +50,13 @@ g++ -std=c++17 -Wall -Wextra -Werror -pedantic -fsanitize=undefined -fno-sanitiz
 ./test_stalker_melee_rules
 ```
 
+Compile and run the isolated flashlight battery rules test with GCC and UndefinedBehaviorSanitizer:
+
+```bash
+g++ -std=c++17 -Wall -Wextra -Werror -pedantic -fsanitize=undefined -fno-sanitize-recover=undefined -I Source/TheLastSignal/Public Tests/test_flashlight_battery_math.cpp -o test_flashlight_battery_math
+./test_flashlight_battery_math
+```
+
 Compile and run the isolated survival health rules test with GCC and UndefinedBehaviorSanitizer:
 
 ```bash
