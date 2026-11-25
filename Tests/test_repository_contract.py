@@ -28,6 +28,18 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertIn('ActionName="UseBattery",Key=R', config)
         for token in ("USpotLightComponent", "FlashlightDrainPerSecond", "AddBatteryPack", "UseBatteryPack"):
             self.assertIn(token, source)
+    def test_flashlight_battery_uses_finite_safe_shared_helper(self):
+        source = (ROOT / "Source/TheLastSignal/Private/LastSignalCharacter.cpp").read_text(encoding="utf-8")
+        self.assertIn('#include "FlashlightBatteryMath.h"', source)
+        self.assertIn("LastSignal::ClampFlashlightBattery(FlashlightBattery)", source)
+        self.assertIn(
+            "LastSignal::DrainFlashlightBattery(FlashlightBattery, FlashlightDrainPerSecond, DeltaSeconds)",
+            source
+        )
+        self.assertIn("LastSignal::TryRechargeFlashlightBattery(", source)
+        self.assertIn("BatteryPackCharge, UpdatedFlashlightBattery", source)
+        self.assertNotIn("FlashlightBattery - FlashlightDrainPerSecond * DeltaSeconds", source)
+        self.assertNotIn("FlashlightBattery + BatteryPackCharge", source)
     def test_battery_inventory_uses_overflow_safe_shared_helper(self):
         source = (ROOT / "Source/TheLastSignal/Private/LastSignalCharacter.cpp").read_text(encoding="utf-8")
         self.assertIn('#include "BatteryInventoryMath.h"', source)
