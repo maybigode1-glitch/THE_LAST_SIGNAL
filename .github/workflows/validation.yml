@@ -24,3 +24,35 @@ jobs:
         run: python Scripts/validate_project.py
       - name: Run unit tests
         run: python -m unittest discover -s Tests -v
+      - name: Compile and run battery inventory C++ regression tests with UBSan
+        run: |
+          g++ -std=c++17 -Wall -Wextra -Werror -pedantic \
+            -fsanitize=undefined -fno-sanitize-recover=undefined \
+            -I Source/TheLastSignal/Public \
+            Tests/test_battery_inventory.cpp \
+            -o /tmp/test_battery_inventory
+          /tmp/test_battery_inventory
+      - name: Compile and run Stalker melee rules C++ regression tests with UBSan
+        run: |
+          g++ -std=c++17 -Wall -Wextra -Werror -pedantic \
+            -fsanitize=undefined -fno-sanitize-recover=undefined \
+            -I Source/TheLastSignal/Public \
+            Tests/test_stalker_melee_rules.cpp \
+            -o /tmp/test_stalker_melee_rules
+          /tmp/test_stalker_melee_rules
+      - name: Compile and run survival health C++ regression tests with UBSan
+        run: |
+          g++ -std=c++17 -Wall -Wextra -Werror -pedantic \
+            -fsanitize=undefined -fno-sanitize-recover=undefined \
+            -I Source/TheLastSignal/Public \
+            Tests/test_survival_health_math.cpp \
+            -o /tmp/test_survival_health_math
+          /tmp/test_survival_health_math
+      - name: Compile and run flashlight battery C++ regression tests with UBSan
+        run: |
+          g++ -std=c++17 -Wall -Wextra -Werror -pedantic \
+            -fsanitize=undefined -fno-sanitize-recover=undefined \
+            -I Source/TheLastSignal/Public \
+            Tests/test_flashlight_battery_math.cpp \
+            -o /tmp/test_flashlight_battery_math
+          /tmp/test_flashlight_battery_math

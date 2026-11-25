@@ -28,10 +28,50 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertIn('ActionName="UseBattery",Key=R', config)
         for token in ("USpotLightComponent", "FlashlightDrainPerSecond", "AddBatteryPack", "UseBatteryPack"):
             self.assertIn(token, source)
-    def test_battery_pickup_adds_inventory_and_is_consumed(self):
-        source = (ROOT / "Source/TheLastSignal/Private/SignalBatteryPickup.cpp").read_text(encoding="utf-8")
-        self.assertIn("AddBatteryPack", source)
-        self.assertIn("Destroy()", source)
+    def test_flashlight_battery_uses_finite_safe_shared_helper(self):
+        source = (ROOT / "Source/TheLastSignal/Private/LastSignalCharacter.cpp").read_text(encoding="utf-8")
+        self.assertIn('#include "FlashlightBatteryMath.h"', source)
+        self.assertIn("LastSignal::ClampFlashlightBattery(FlashlightBattery)", source)
+        self.assertIn(
+            "LastSignal::DrainFlashlightBattery(FlashlightBattery, FlashlightDrainPerSecond, DeltaSeconds)",
+            source
+        )
+        self.assertIn("LastSignal::TryRechargeFlashlightBattery(", source)
+        self.assertIn("BatteryPackCharge, UpdatedFlashlightBattery", source)
+        self.assertNotIn("FlashlightBattery - FlashlightDrainPerSecond * DeltaSeconds", source)
+        self.assertNotIn("FlashlightBattery + BatteryPackCharge", source)
+    def test_flashlight_pack_is_consumed_only_after_successful_recharge(self):
+        source = (ROOT / "Source/TheLastSignal/Private/LastSignalCharacter.cpp").read_text(encoding="utf-8")
+        use_battery = source.split("void ALastSignalCharacter::UseBatteryPack()", 1)[1].split(
+            "\nvoid ALastSignalCharacter::TryInteract()", 1
+        )[0]
+        self.assertIn("if (!LastSignal::TryRechargeFlashlightBattery(", use_battery)
+        self.assertLess(
+            use_battery.index("TryRechargeFlashlightBattery"),
+            use_battery.index("--BatteryPacks;")
+        )
+        failure_path = use_battery.split("if (!LastSignal::TryRechargeFlashlightBattery(", 1)[1].split(
+            "--BatteryPacks;", 1
+        )[0]
+        self.assertIn("return;", failure_path)
+        self.assertIn("FlashlightBattery = UpdatedFlashlightBattery;", use_battery)
+        self.assertIn("bFlashlightOn = false;", source)
+
+    def test_battery_inventory_uses_overflow_safe_shared_helper(self):
+        source = (ROOT / "Source/TheLastSignal/Private/LastSignalCharacter.cpp").read_text(encoding="utf-8")
+        self.assertIn('#include "BatteryInventoryMath.h"', source)
+        self.assertIn("LastSignal::TryAddBatteryPacks(BatteryPacks, Amount, UpdatedBatteryPacks)", source)
+        self.assertNotIn("FMath::Clamp(BatteryPacks + Amount", source)
+    def test_battery_pickup_is_consumed_only_after_inventory_accepts_pack(self):
+        pickup = (ROOT / "Source/TheLastSignal/Private/SignalBatteryPickup.cpp").read_text(encoding="utf-8")
+        character_header = (ROOT / "Source/TheLastSignal/Public/LastSignalCharacter.h").read_text(encoding="utf-8")
+        character = (ROOT / "Source/TheLastSignal/Private/LastSignalCharacter.cpp").read_text(encoding="utf-8")
+        self.assertIn("bool AddBatteryPack", character_header)
+        self.assertIn("LastSignal::TryAddBatteryPacks", character)
+        interaction = pickup.split("void ASignalBatteryPickup::Interact_Implementation", 1)[1]
+        self.assertIn("if (!Character->AddBatteryPack(PacksGranted)) return;", interaction)
+        self.assertLess(interaction.index("AddBatteryPack"), interaction.index("Destroy()"))
+        self.assertIn("bHasBeenActivated = true;", interaction)
     def test_signal_interactions_update_objective_progress(self):
         interactable = (ROOT / "Source/TheLastSignal/Private/SignalInteractable.cpp").read_text(encoding="utf-8")
         game_mode = (ROOT / "Source/TheLastSignal/Private/LastSignalGameMode.cpp").read_text(encoding="utf-8")
@@ -53,6 +93,27 @@ class RepositoryContractTests(unittest.TestCase):
         for token in ("LineOfSightTo", "MoveToActor", "MoveToLocation", "PerformAttack", "GetRandomReachablePointInRadius"):
             self.assertIn(token, source)
         self.assertIn("AIModule", (ROOT / "Source/TheLastSignal/TheLastSignal.Build.cs").read_text(encoding="utf-8"))
+    def test_stalker_attack_defers_damage_and_revalidates_at_impact(self):
+        source = (ROOT / "Source/TheLastSignal/Private/SignalStalker.cpp").read_text(encoding="utf-8")
+        attack = source.split("void ASignalStalker::PerformAttack()", 1)[1].split(
+            "void ASignalStalker::ApplyAttackDamage()", 1
+        )[0]
+        impact = source.split("void ASignalStalker::ApplyAttackDamage()", 1)[1].split(
+            "void ASignalStalker::ClearAttackState()", 1
+        )[0]
+        self.assertIn("&ASignalStalker::ApplyAttackDamage", attack)
+        self.assertIn("AttackImpactDelay", attack)
+        self.assertIn("AttackMontage->GetPlayLength() * 0.35f", attack)
+        self.assertIn(": 0.3f", attack)
+        self.assertNotIn("TakeDamage", attack)
+        self.assertIn('#include "StalkerMeleeRules.h"', source)
+        self.assertIn("const bool bHasLineOfSight = bHasAIController && AI->LineOfSightTo(Player);", impact)
+        self.assertIn(
+            "LastSignal::CanApplyStalkerMeleeDamage(Distance, AttackRange, bIsAttacking, bHasAIController, bHasLineOfSight)",
+            impact
+        )
+        self.assertLess(impact.index("CanApplyStalkerMeleeDamage"), impact.index("Player->TakeDamage"))
+        self.assertIn("Player->TakeDamage", impact)
     def test_player_health_and_death_are_connected_to_hud(self):
         character = (ROOT / "Source/TheLastSignal/Private/LastSignalCharacter.cpp").read_text(encoding="utf-8")
         hud = (ROOT / "Source/TheLastSignal/Private/LastSignalHUD.cpp").read_text(encoding="utf-8")
@@ -60,6 +121,23 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertIn("bIsDead", character)
         self.assertIn("GetHealthPercent", hud)
         self.assertIn("HEALTH", hud)
+    def test_player_rejects_invalid_damage_before_super_and_uses_shared_health_math(self):
+        source = (ROOT / "Source/TheLastSignal/Private/LastSignalCharacter.cpp").read_text(encoding="utf-8")
+        self.assertIn('#include "SurvivalHealthMath.h"', source)
+        damage = source.split("float ALastSignalCharacter::TakeDamage", 1)[1].split(
+            "\nvoid ALastSignalCharacter::SetupPlayerInputComponent", 1
+        )[0]
+        self.assertLess(
+            damage.index("IsValidDamageAmount(DamageAmount)"),
+            damage.index("Super::TakeDamage")
+        )
+        self.assertIn(
+            "TryApplyDamageToHealth(Health, AppliedDamage, UpdatedHealth)", damage
+        )
+        self.assertLess(
+            damage.index("TryApplyDamageToHealth"),
+            damage.index("Health = UpdatedHealth")
+        )
     def test_stalker_animation_state_and_montage_hooks(self):
         header = (ROOT / "Source/TheLastSignal/Public/SignalStalkerAnimInstance.h").read_text(encoding="utf-8")
         source = (ROOT / "Source/TheLastSignal/Private/SignalStalkerAnimInstance.cpp").read_text(encoding="utf-8")
@@ -71,7 +149,7 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertIn("Montage_Play", enemy)
         self.assertIn("ApplyAttackDamage", enemy)
         self.assertIn("AttackImpactTimer", enemy)
-        self.assertIn("AttackRange + 75.0f", enemy)
+        self.assertIn("StalkerMeleeRangeGrace = 75.0f", (ROOT / "Source/TheLastSignal/Public/StalkerMeleeRules.h").read_text(encoding="utf-8"))
         self.assertIn("GreyboxVisual", enemy)
         self.assertIn("BasicShapes/Cube.Cube", enemy)
     def test_stalker_audio_cues_are_configurable_and_triggered(self):
@@ -94,7 +172,6 @@ class RepositoryContractTests(unittest.TestCase):
         for token in ("get_editor_world", "PlayerStart", "NavMeshBoundsVolume", "SignalInteractable", "SignalBatteryPickup", "SignalStalker", "RelayStation01_QA.json", "all(checks.values())"):
             self.assertIn(token, source)
         compile(source, "qa_relay_station.py", "exec")
-
     def test_missing_source_file_is_reported(self):
         import tempfile
         with tempfile.TemporaryDirectory() as tmp:

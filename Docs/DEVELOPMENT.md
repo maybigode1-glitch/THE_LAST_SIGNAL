@@ -1,31 +1,69 @@
 # Development and test environment
 
-## Free cloud test lane
+## Repository CI lane
 
-GitHub Actions on GitHub-hosted Linux runners is used for lightweight repository checks. Keep the repository public and stay within GitHub's current usage and fair-use limits to use the standard public-repository runners without charge.
+GitHub Actions uses a GitHub-hosted Ubuntu runner for checks that do not require Unreal Engine. The current workflow runs Python 3.12 and the system GCC C++ compiler.
 
-## What CI currently verifies
+## What CI verifies
 
-- Python syntax/importability of the validation script.
-- .uproject JSON syntax and basic metadata, when a project descriptor exists at the repository root.
-- Three unit tests for valid, missing-field, and malformed project metadata.
+- `Scripts/validate_project.py` checks the project descriptor, required repository files, and basic Unreal project metadata.
+- `python -m unittest discover -s Tests -v` runs the complete Python regression suite. This includes project metadata checks, INI-helper behavior, mocked Unreal Editor QA behavior (including fail-closed reporting when an actor class or label cannot be inspected), the map-builder/QA actor contract, and map-builder preflight/cleanup contracts. These Python checks do not execute Unreal Editor.
+- A standalone C++17 executable compiles the exact `BatteryInventoryMath.h` header included by the character source, with `-Wall -Wextra -Werror -pedantic -fsanitize=undefined -fno-sanitize-recover=undefined`, and runs 16 battery-inventory arithmetic and accepted/rejected pickup cases.
+- A second standalone C++17 executable compiles `StalkerMeleeRules.h` with the same warning and UndefinedBehaviorSanitizer policy and runs 15 impact-predicate cases covering active attack state, range boundaries, controller possession, line of sight, and invalid negative/non-finite geometry inputs.
+- A third standalone C++17 executable compiles `SurvivalHealthMath.h`, also with UndefinedBehaviorSanitizer, and runs 13 cases for ordinary, fractional, lethal, overkill, non-positive, NaN, infinite, and invalid current-health inputs.
+- A fourth standalone C++17 executable compiles `FlashlightBatteryMath.h` with the same warning and UndefinedBehaviorSanitizer policy and runs 25 cases for normalization, ordinary/depleted drain, invalid time/rate values, overflow-resistant large drains, capped recharge, rejected invalid recharge inputs, and aliased input/output behavior.
+
+UndefinedBehaviorSanitizer is enabled for all native regression executables so undefined behavior detected during a test terminates the CI step instead of being silently recovered.
+
+These standalone C++ tests validate isolated pure-helper contracts only. They do not compile the Unreal module or exercise Unreal reflection, gameplay, or Blueprint integration.
 
 ## What CI does not verify
 
-- UnrealBuildTool or Unreal Editor availability.
-- Compilation of Unreal C++ modules.
-- Loading maps/assets, rendering, audio, input, gameplay, or performance.
-- Windows packaging or a playable build.
+- Unreal Editor or UnrealBuildTool availability, startup, or project-file generation.
+- Compilation of the Unreal C++ module against Unreal Engine 5.4.
+- Loading or saving the generated `.umap`, map geometry, collision, navigation generation, or asset references.
+- Rendering, input, audio, interaction, AI pathfinding, combat timing, or other runtime gameplay.
+- Windows packaging, performance, or a playable build.
 
-Do not label these repository checks as an Unreal Engine build.
+Do not describe repository CI as an Unreal Engine build or as proof that the vertical slice runs.
 
 ## Local commands
+
+Run the repository checks from the project root:
 
 ```bash
 python Scripts/validate_project.py
 python -m unittest discover -s Tests -v
 ```
 
+Compile and run the isolated battery helper test with GCC and UndefinedBehaviorSanitizer:
+
+```bash
+g++ -std=c++17 -Wall -Wextra -Werror -pedantic -fsanitize=undefined -fno-sanitize-recover=undefined -I Source/TheLastSignal/Public Tests/test_battery_inventory.cpp -o test_battery_inventory
+./test_battery_inventory
+```
+
+Compile and run the isolated Stalker melee rules test with GCC and UndefinedBehaviorSanitizer:
+
+```bash
+g++ -std=c++17 -Wall -Wextra -Werror -pedantic -fsanitize=undefined -fno-sanitize-recover=undefined -I Source/TheLastSignal/Public Tests/test_stalker_melee_rules.cpp -o test_stalker_melee_rules
+./test_stalker_melee_rules
+```
+
+Compile and run the isolated flashlight battery rules test with GCC and UndefinedBehaviorSanitizer:
+
+```bash
+g++ -std=c++17 -Wall -Wextra -Werror -pedantic -fsanitize=undefined -fno-sanitize-recover=undefined -I Source/TheLastSignal/Public Tests/test_flashlight_battery_math.cpp -o test_flashlight_battery_math
+./test_flashlight_battery_math
+```
+
+Compile and run the isolated survival health rules test with GCC and UndefinedBehaviorSanitizer:
+
+```bash
+g++ -std=c++17 -Wall -Wextra -Werror -pedantic -fsanitize=undefined -fno-sanitize-recover=undefined -I Source/TheLastSignal/Public Tests/test_survival_health_math.cpp -o test_survival_health_math
+./test_survival_health_math
+```
+
 ## Future Unreal validation
 
-A genuine Unreal build lane requires an authorized Unreal Engine installation and a runner with compatible OS, memory, storage, and (for editor/rendering tests) GPU support. Do not put Epic credentials or license secrets in repository files. A free generic Linux runner is not a substitute for a Windows Unreal workstation.
+A genuine Unreal validation lane requires an authorized Unreal Engine 5.4 installation and a runner/workstation with compatible OS, memory, storage, and (for editor/rendering tests) GPU support. Do not put Epic credentials or license secrets in repository files. A generic Linux runner is not a substitute for a compatible Unreal workstation.

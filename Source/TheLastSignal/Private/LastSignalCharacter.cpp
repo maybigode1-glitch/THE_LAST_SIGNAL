@@ -1,4 +1,7 @@
 #include "LastSignalCharacter.h"
+#include "BatteryInventoryMath.h"
+#include "SurvivalHealthMath.h"
+#include "FlashlightBatteryMath.h"
 #include "SignalInteractable.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
@@ -33,14 +36,14 @@ ALastSignalCharacter::ALastSignalCharacter()
 void ALastSignalCharacter::BeginPlay()
 {
     Super::BeginPlay();
-    FlashlightBattery = FMath::Clamp(FlashlightBattery, 0.0f, 100.0f);
+    FlashlightBattery = LastSignal::ClampFlashlightBattery(FlashlightBattery);
     Health = FMath::Clamp(MaxHealth, 1.0f, 100.0f);
 }
 void ALastSignalCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
     if (!bFlashlightOn) return;
-    FlashlightBattery = FMath::Max(0.0f, FlashlightBattery - FlashlightDrainPerSecond * DeltaSeconds);
+    FlashlightBattery = LastSignal::DrainFlashlightBattery(FlashlightBattery, FlashlightDrainPerSecond, DeltaSeconds);
     if (FlashlightBattery <= 0.0f)
     {
         bFlashlightOn = false;
@@ -50,9 +53,13 @@ void ALastSignalCharacter::Tick(float DeltaSeconds)
 }
 float ALastSignalCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+    if (!LastSignal::IsValidDamageAmount(DamageAmount)) return 0.0f;
+
     const float AppliedDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-    if (bIsDead || AppliedDamage <= 0.0f) return 0.0f;
-    Health = FMath::Max(0.0f, Health - AppliedDamage);
+    float UpdatedHealth = Health;
+    if (bIsDead || !LastSignal::TryApplyDamageToHealth(Health, AppliedDamage, UpdatedHealth)) return 0.0f;
+
+    Health = UpdatedHealth;
     if (Health <= 0.0f)
     {
         bIsDead = true;
@@ -100,22 +107,46 @@ void ALastSignalCharacter::ToggleFlashlight()
     bFlashlightOn = true;
     Flashlight->SetVisibility(true);
 }
-void ALastSignalCharacter::AddBatteryPack(int32 Amount)
+bool ALastSignalCharacter::AddBatteryPack(int32 Amount)
 {
-    if (Amount <= 0 || bIsDead) return;
-    BatteryPacks = FMath::Clamp(BatteryPacks + Amount, 0, 99);
+    if (Amount <= 0 || bIsDead) return false;
+
+    int32 UpdatedBatteryPacks = BatteryPacks;
+    if (!LastSignal::TryAddBatteryPacks(BatteryPacks, Amount, UpdatedBatteryPacks))
+    {
+        if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, TEXT("Battery inventory full"));
+        return false;
+    }
+
+    BatteryPacks = UpdatedBatteryPacks;
     if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Battery pack collected | Inventory: %d"), BatteryPacks));
+    return true;
 }
 void ALastSignalCharacter::UseBatteryPack()
 {
     if (bIsDead) return;
-    if (BatteryPacks <= 0 || FlashlightBattery >= 100.0f)
+    if (BatteryPacks <= 0)
     {
-        if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, BatteryPacks <= 0 ? TEXT("No spare battery packs") : TEXT("Flashlight is already full"));
+        if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, TEXT("No spare battery packs"));
         return;
     }
+
+    float UpdatedFlashlightBattery = FlashlightBattery;
+    if (!LastSignal::TryRechargeFlashlightBattery(
+        FlashlightBattery, BatteryPackCharge, UpdatedFlashlightBattery))
+    {
+        if (GEngine)
+        {
+            const TCHAR* Message = FlashlightBattery >= 100.0f
+                ? TEXT("Flashlight is already full")
+                : TEXT("Battery pack could not recharge flashlight");
+            GEngine->AddOnScreenDebugMessage(-1, 1.5f, FColor::Yellow, Message);
+        }
+        return;
+    }
+
     --BatteryPacks;
-    FlashlightBattery = FMath::Min(100.0f, FlashlightBattery + BatteryPackCharge);
+    FlashlightBattery = UpdatedFlashlightBattery;
     if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Green, FString::Printf(TEXT("Flashlight recharged: %.0f%% | Packs: %d"), FlashlightBattery, BatteryPacks));
 }
 void ALastSignalCharacter::TryInteract()

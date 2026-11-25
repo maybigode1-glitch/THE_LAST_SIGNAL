@@ -10,6 +10,9 @@ REQUIRED_FILES = (
     "Scripts/create_relay_station_map.py", "Scripts/qa_relay_station.py",
     "Source/TheLastSignal/TheLastSignal.Build.cs", "Source/TheLastSignal/Private/TheLastSignal.cpp",
     "Source/TheLastSignal/Public/LastSignalCharacter.h", "Source/TheLastSignal/Private/LastSignalCharacter.cpp",
+    "Source/TheLastSignal/Public/BatteryInventoryMath.h", "Source/TheLastSignal/Public/SurvivalHealthMath.h",
+    "Source/TheLastSignal/Public/FlashlightBatteryMath.h",
+    "Tests/test_flashlight_battery_math.cpp",
     "Source/TheLastSignal/Public/SignalInteractable.h", "Source/TheLastSignal/Private/SignalInteractable.cpp",
     "Source/TheLastSignal/Public/SignalBatteryPickup.h", "Source/TheLastSignal/Private/SignalBatteryPickup.cpp",
     "Source/TheLastSignal/Public/LastSignalGameMode.h", "Source/TheLastSignal/Private/LastSignalGameMode.cpp",
@@ -18,6 +21,7 @@ REQUIRED_FILES = (
     "Source/TheLastSignal/Public/SignalStalkerAnimInstance.h", "Source/TheLastSignal/Private/SignalStalkerAnimInstance.cpp",
     "Source/TheLastSignal/Public/SignalPrototypeArea.h", "Source/TheLastSignal/Private/SignalPrototypeArea.cpp",
     "Docs/FIRST_PLAYABLE_AREA.md",
+    "Tests/test_survival_health_math.cpp",
 )
 def validate_uproject(path: Path) -> list[str]:
     try:
@@ -52,12 +56,12 @@ def validate_repository(root: Path) -> list[str]:
             if mapping not in config:
                 errors.append(f"Missing input mapping: {mapping}")
     checks = {
-        "Source/TheLastSignal/Private/LastSignalCharacter.cpp": ("USpotLightComponent", "ToggleFlashlight", "FlashlightDrainPerSecond", "AddBatteryPack", "UseBatteryPack"),
+        "Source/TheLastSignal/Private/LastSignalCharacter.cpp": ("USpotLightComponent", "ToggleFlashlight", "FlashlightDrainPerSecond", "AddBatteryPack", "UseBatteryPack", '#include "SurvivalHealthMath.h"', "IsValidDamageAmount(DamageAmount)", "TryApplyDamageToHealth(Health, AppliedDamage, UpdatedHealth)", '#include "FlashlightBatteryMath.h"', "ClampFlashlightBattery(FlashlightBattery)", "DrainFlashlightBattery(FlashlightBattery, FlashlightDrainPerSecond, DeltaSeconds)", "TryRechargeFlashlightBattery("),
         "Source/TheLastSignal/Private/SignalBatteryPickup.cpp": ("ASignalBatteryPickup", "AddBatteryPack", "Destroy()"),
         "Source/TheLastSignal/Private/LastSignalGameMode.cpp": ("RegisterSignalCollected", "AreObjectivesComplete", "ALastSignalHUD::StaticClass"),
         "Source/TheLastSignal/Private/LastSignalHUD.cpp": ("GetFlashlightBatteryPercent", "GetBatteryPackCount", "GetSignalsCollected", "GetRequiredSignals", "DrawHUD", "FLASHLIGHT", "SPARE BATTERIES", "GetHealthPercent"),
         "Source/TheLastSignal/Private/SignalInteractable.cpp": ("RegisterSignalCollected", "bHasBeenActivated", "Cast<ALastSignalCharacter>(InteractingActor)", "AreObjectivesComplete"),
-        "Source/TheLastSignal/Private/SignalStalker.cpp": ("AAIController", "LineOfSightTo", "MoveToActor", "MoveToLocation", "PerformAttack", "TakeDamage", "GetRandomReachablePointInRadius", "FootstepSound", "AlertSound", "AttackSound", "SearchSound", "AmbientLoopSound", "ChaseLoopSound", "Montage_Play", "bIsAttacking", "ApplyAttackDamage", "AttackImpactTimer", "AttackRange + 75.0f", "GreyboxVisual", "BasicShapes/Cube.Cube"),
+        "Source/TheLastSignal/Private/SignalStalker.cpp": ("AAIController", "LineOfSightTo", "MoveToActor", "MoveToLocation", "PerformAttack", "TakeDamage", "GetRandomReachablePointInRadius", "FootstepSound", "AlertSound", "AttackSound", "SearchSound", "AmbientLoopSound", "ChaseLoopSound", "Montage_Play", "bIsAttacking", "ApplyAttackDamage", "AttackImpactTimer", '#include "StalkerMeleeRules.h"', "CanApplyStalkerMeleeDamage", "bHasAIController", "bHasLineOfSight", "GreyboxVisual", "BasicShapes/Cube.Cube"),
         "Source/TheLastSignal/Private/SignalStalkerAnimInstance.cpp": ("NativeUpdateAnimation", "GroundSpeed", "IsChasing", "IsSearching", "IsAttacking"),
         "Source/TheLastSignal/Private/SignalPrototypeArea.cpp": ("BuildGeometry", "SpawnObjectivesAndPickups", "SpawnStalker", "ASignalBatteryPickup", "ASignalInteractable", "ASignalStalker", "BasicShapes/Cube.Cube"),
     }

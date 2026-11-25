@@ -8,7 +8,7 @@ void ASignalBatteryPickup::Interact_Implementation(AActor* InteractingActor)
 {
     ALastSignalCharacter* Character = Cast<ALastSignalCharacter>(InteractingActor);
     if (!Character || bHasBeenActivated) return;
-    Character->AddBatteryPack(PacksGranted);
+    if (!Character->AddBatteryPack(PacksGranted)) return;
     bHasBeenActivated = true;
     Destroy();
 }
