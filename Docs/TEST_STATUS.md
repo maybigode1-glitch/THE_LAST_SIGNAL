@@ -36,7 +36,7 @@
 - [x] Offline tests for the map builder INI helper: update existing keys while preserving unrelated settings, create a missing section, and repeat updates idempotently.
 
 ## Automated validation
-- [x] GitHub Actions workflow runs repository metadata validation, the complete Python unit-test suite, the standalone battery inventory C++ regression executable (16 cases), the standalone Stalker melee rules C++ regression executable (15 cases), and the survival health C++ regression executable (13 cases). See the latest checks on [PR #2](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/pull/2).
+- [x] GitHub Actions workflow runs repository metadata validation, the complete Python unit-test suite, the standalone battery inventory C++ regression executable (16 cases), the standalone Stalker melee rules C++ regression executable (15 cases), the survival health C++ regression executable (13 cases), and the flashlight battery C++ regression executable (22 cases). See the latest checks on [PR #2](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/pull/2).
 
 ## Validation still pending
 - [ ] Run `Scripts/qa_relay_station.py` inside Unreal Editor after generating the map; inspect `Saved/RelayStation01_QA.json`.
