@@ -40,6 +40,23 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertIn("BatteryPackCharge, UpdatedFlashlightBattery", source)
         self.assertNotIn("FlashlightBattery - FlashlightDrainPerSecond * DeltaSeconds", source)
         self.assertNotIn("FlashlightBattery + BatteryPackCharge", source)
+    def test_flashlight_pack_is_consumed_only_after_successful_recharge(self):
+        source = (ROOT / "Source/TheLastSignal/Private/LastSignalCharacter.cpp").read_text(encoding="utf-8")
+        use_battery = source.split("void ALastSignalCharacter::UseBatteryPack()", 1)[1].split(
+            "\\nvoid ALastSignalCharacter::TryInteract()", 1
+        )[0]
+        self.assertIn("if (!LastSignal::TryRechargeFlashlightBattery(", use_battery)
+        self.assertLess(
+            use_battery.index("TryRechargeFlashlightBattery"),
+            use_battery.index("--BatteryPacks;")
+        )
+        failure_path = use_battery.split("if (!LastSignal::TryRechargeFlashlightBattery(", 1)[1].split(
+            "--BatteryPacks;", 1
+        )[0]
+        self.assertIn("return;", failure_path)
+        self.assertIn("FlashlightBattery = UpdatedFlashlightBattery;", use_battery)
+        self.assertIn("bFlashlightOn = false;", source)
+
     def test_battery_inventory_uses_overflow_safe_shared_helper(self):
         source = (ROOT / "Source/TheLastSignal/Private/LastSignalCharacter.cpp").read_text(encoding="utf-8")
         self.assertIn('#include "BatteryInventoryMath.h"', source)
