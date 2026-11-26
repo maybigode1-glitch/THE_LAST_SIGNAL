@@ -31,13 +31,21 @@ g++ -std=c++17 -Wall -Wextra -Werror -pedantic \
 /tmp/test_objective_progress_math
 ```
 
-The test currently covers 22 cases, including normal progress, repeated registration after
+The test covers 22 cases, including normal progress, repeated registration after
 completion, invalid target/count normalization, signed 32-bit boundaries, completion
 reporting, and aliased output.
 
+## Automated validation
+
+GitHub Actions run [#206](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/actions/runs/45824061619)
+passed the repository metadata validator, the complete Python unit-test suite (including
+the two new GameMode source-contract checks), and all five standalone C++ regression
+executables. The new objective helper was compiled as C++17 with warnings-as-errors and
+UndefinedBehaviorSanitizer; all 22 cases passed.
+
 ## Validation boundary
 
-This native test proves only the pure objective-progress helper. The Python source-contract
-test checks that GameMode calls the helper in the expected places. Neither test executes
-Unreal reflection, Blueprint events, map assets, Editor startup, or runtime gameplay.
-Those still require an authorized Unreal Editor session and a real playtest.
+These checks prove only the pure objective-progress helper and the expected source-level
+GameMode wiring. They do not execute Unreal reflection, Blueprint events, map assets,
+Editor startup, or runtime gameplay. Those still require an authorized Unreal Editor
+session and a real playtest.
