@@ -9,21 +9,33 @@ namespace LastSignal
         return std::isfinite(damage) && damage > 0.0f;
     }
 
-    // Reject invalid health/damage values before they can poison the player's health state.
+    // Report the health actually removed, not the requested overkill amount.
+    // Invalid health/damage values leave health unchanged and report zero applied damage.
     inline bool TryApplyDamageToHealth(
         float currentHealth,
         float damage,
-        float& updatedHealth
+        float& updatedHealth,
+        float& appliedDamage
     ) noexcept
     {
         updatedHealth = currentHealth;
+        appliedDamage = 0.0f;
         if (!std::isfinite(currentHealth) || currentHealth <= 0.0f ||
             !IsValidDamageAmount(damage))
         {
             return false;
         }
 
-        updatedHealth = damage >= currentHealth ? 0.0f : currentHealth - damage;
+        if (damage >= currentHealth)
+        {
+            updatedHealth = 0.0f;
+            appliedDamage = currentHealth;
+        }
+        else
+        {
+            updatedHealth = currentHealth - damage;
+            appliedDamage = damage;
+        }
         return true;
     }
 }
