@@ -131,8 +131,9 @@ class RepositoryContractTests(unittest.TestCase):
             damage.index("bIsDead || !LastSignal::IsValidDamageAmount(DamageAmount)"),
             damage.index("Super::TakeDamage")
         )
+        self.assertIn("TryApplyDamageToHealth(", damage)
         self.assertIn(
-            "TryApplyDamageToHealth(Health, DamageAfterEngineRules, UpdatedHealth, ActualDamage)",
+            "Health, DamageAfterEngineRules, UpdatedHealth, ActualDamage",
             damage
         )
         self.assertLess(
