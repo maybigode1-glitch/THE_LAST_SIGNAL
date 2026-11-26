@@ -125,19 +125,22 @@ class RepositoryContractTests(unittest.TestCase):
         source = (ROOT / "Source/TheLastSignal/Private/LastSignalCharacter.cpp").read_text(encoding="utf-8")
         self.assertIn('#include "SurvivalHealthMath.h"', source)
         damage = source.split("float ALastSignalCharacter::TakeDamage", 1)[1].split(
-            "\nvoid ALastSignalCharacter::SetupPlayerInputComponent", 1
+            "\\nvoid ALastSignalCharacter::SetupPlayerInputComponent", 1
         )[0]
         self.assertLess(
-            damage.index("IsValidDamageAmount(DamageAmount)"),
+            damage.index("bIsDead || !LastSignal::IsValidDamageAmount(DamageAmount)"),
             damage.index("Super::TakeDamage")
         )
         self.assertIn(
-            "TryApplyDamageToHealth(Health, AppliedDamage, UpdatedHealth)", damage
+            "TryApplyDamageToHealth(Health, DamageAfterEngineRules, UpdatedHealth, ActualDamage)",
+            damage
         )
         self.assertLess(
             damage.index("TryApplyDamageToHealth"),
             damage.index("Health = UpdatedHealth")
         )
+        self.assertIn("return ActualDamage;", damage)
+        self.assertNotIn("return DamageAfterEngineRules;", damage)
     def test_stalker_animation_state_and_montage_hooks(self):
         header = (ROOT / "Source/TheLastSignal/Public/SignalStalkerAnimInstance.h").read_text(encoding="utf-8")
         source = (ROOT / "Source/TheLastSignal/Private/SignalStalkerAnimInstance.cpp").read_text(encoding="utf-8")
