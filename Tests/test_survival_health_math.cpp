@@ -31,7 +31,7 @@ namespace
                       << ", applied=" << expectedAppliedDamage
                       << "; got accepted=" << accepted
                       << ", health=" << updatedHealth
-                      << ", applied=" << appliedDamage << '\\n';
+                      << ", applied=" << appliedDamage << '\n';
             std::exit(EXIT_FAILURE);
         }
     }
@@ -58,6 +58,6 @@ int main()
     ExpectApply("zero current health is rejected", 0.0f, 1.0f, false, 0.0f, 0.0f);
     ExpectApply("negative current health is rejected", -1.0f, 1.0f, false, -1.0f, 0.0f);
 
-    std::cout << "Survival health damage rules: 16 cases passed\\n";
+    std::cout << "Survival health damage rules: 16 cases passed\n";
     return EXIT_SUCCESS;
 }
