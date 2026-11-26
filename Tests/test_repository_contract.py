@@ -87,7 +87,7 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertIn("GetSignalsCollected", hud)
         self.assertIn("GetRequiredSignals", hud)
         self.assertIn("ALastSignalHUD::StaticClass", mode)
-        self.assertNotIn("\\n        const float HealthY", hud)
+        self.assertNotIn("\n        const float HealthY", hud)
     def test_stalker_ai_has_patrol_chase_search_and_attack(self):
         source = (ROOT / "Source/TheLastSignal/Private/SignalStalker.cpp").read_text(encoding="utf-8")
         for token in ("LineOfSightTo", "MoveToActor", "MoveToLocation", "PerformAttack", "GetRandomReachablePointInRadius"):
@@ -125,7 +125,7 @@ class RepositoryContractTests(unittest.TestCase):
         source = (ROOT / "Source/TheLastSignal/Private/LastSignalCharacter.cpp").read_text(encoding="utf-8")
         self.assertIn('#include "SurvivalHealthMath.h"', source)
         damage = source.split("float ALastSignalCharacter::TakeDamage", 1)[1].split(
-            "\\nvoid ALastSignalCharacter::SetupPlayerInputComponent", 1
+            "\nvoid ALastSignalCharacter::SetupPlayerInputComponent", 1
         )[0]
         self.assertLess(
             damage.index("bIsDead || !LastSignal::IsValidDamageAmount(DamageAmount)"),
