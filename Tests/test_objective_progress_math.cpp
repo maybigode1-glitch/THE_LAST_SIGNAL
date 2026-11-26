@@ -11,7 +11,7 @@ namespace
     {
         if (actual != expected)
         {
-            std::cerr << name << ": expected " << expected << ", got " << actual << '\\n';
+            std::cerr << name << ": expected " << expected << ", got " << actual << '\n';
             std::exit(EXIT_FAILURE);
         }
     }
@@ -20,7 +20,7 @@ namespace
     {
         if (actual != expected)
         {
-            std::cerr << name << ": expected " << expected << ", got " << actual << '\\n';
+            std::cerr << name << ": expected " << expected << ", got " << actual << '\n';
             std::exit(EXIT_FAILURE);
         }
     }
@@ -71,6 +71,6 @@ int main()
     ExpectBool("aliased output rejects after completion", LastSignal::TryRegisterSignalCollected(aliased, 3, aliased), false);
     ExpectCount("aliased output remains at target", aliased, 3);
 
-    std::cout << "Objective progress rules: 22 cases passed\\n";
+    std::cout << "Objective progress rules: 22 cases passed\n";
     return EXIT_SUCCESS;
 }
