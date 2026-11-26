@@ -56,7 +56,7 @@ def validate_repository(root: Path) -> list[str]:
             if mapping not in config:
                 errors.append(f"Missing input mapping: {mapping}")
     checks = {
-        "Source/TheLastSignal/Private/LastSignalCharacter.cpp": ("USpotLightComponent", "ToggleFlashlight", "FlashlightDrainPerSecond", "AddBatteryPack", "UseBatteryPack", '#include "SurvivalHealthMath.h"', "IsValidDamageAmount(DamageAmount)", "TryApplyDamageToHealth(Health, DamageAfterEngineRules, UpdatedHealth, ActualDamage)", "return ActualDamage;", '#include "FlashlightBatteryMath.h"', "ClampFlashlightBattery(FlashlightBattery)", "DrainFlashlightBattery(FlashlightBattery, FlashlightDrainPerSecond, DeltaSeconds)", "TryRechargeFlashlightBattery("),
+        "Source/TheLastSignal/Private/LastSignalCharacter.cpp": ("USpotLightComponent", "ToggleFlashlight", "FlashlightDrainPerSecond", "AddBatteryPack", "UseBatteryPack", '#include "SurvivalHealthMath.h"', "IsValidDamageAmount(DamageAmount)", "TryApplyDamageToHealth(", "DamageAfterEngineRules, UpdatedHealth, ActualDamage", "return ActualDamage;", '#include "FlashlightBatteryMath.h"', "ClampFlashlightBattery(FlashlightBattery)", "DrainFlashlightBattery(FlashlightBattery, FlashlightDrainPerSecond, DeltaSeconds)", "TryRechargeFlashlightBattery("),
         "Source/TheLastSignal/Private/SignalBatteryPickup.cpp": ("ASignalBatteryPickup", "AddBatteryPack", "Destroy()"),
         "Source/TheLastSignal/Private/LastSignalGameMode.cpp": ("RegisterSignalCollected", "AreObjectivesComplete", "ALastSignalHUD::StaticClass"),
         "Source/TheLastSignal/Private/LastSignalHUD.cpp": ("GetFlashlightBatteryPercent", "GetBatteryPackCount", "GetSignalsCollected", "GetRequiredSignals", "DrawHUD", "FLASHLIGHT", "SPARE BATTERIES", "GetHealthPercent"),
