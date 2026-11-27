@@ -12,6 +12,7 @@ GitHub Actions uses a GitHub-hosted Ubuntu runner for checks that do not require
 - A second standalone C++17 executable compiles `StalkerMeleeRules.h` with the same warning and UndefinedBehaviorSanitizer policy and runs 15 impact-predicate cases covering active attack state, range boundaries, controller possession, line of sight, and invalid negative/non-finite geometry inputs.
 - A third standalone C++17 executable compiles `SurvivalHealthMath.h`, also with UndefinedBehaviorSanitizer, and runs 16 cases. It checks that overkill reports only the remaining health, that partial-health hits report the actual amount removed, and that non-positive/non-finite damage or invalid health is rejected. The character returns zero for repeat damage after death and does not call the engine damage handler again.
 - A fourth standalone C++17 executable compiles `FlashlightBatteryMath.h` with the same warning and UndefinedBehaviorSanitizer policy and runs 25 cases for normalization, ordinary/depleted drain, invalid time/rate values, overflow-resistant large drains, capped recharge, rejected invalid recharge inputs, and aliased input/output behavior.
+- A fifth standalone C++17 executable compiles `ObjectiveProgressMath.h` with the same warning and UndefinedBehaviorSanitizer policy and runs 22 cases for target normalization, progress clamping, completion, saturating registration, `INT32_MAX`, and aliased output.
 
 UndefinedBehaviorSanitizer is enabled for all native regression executables so undefined behavior detected during a test terminates the CI step instead of being silently recovered.
 
@@ -55,6 +56,13 @@ Compile and run the isolated flashlight battery rules test with GCC and Undefine
 ```bash
 g++ -std=c++17 -Wall -Wextra -Werror -pedantic -fsanitize=undefined -fno-sanitize-recover=undefined -I Source/TheLastSignal/Public Tests/test_flashlight_battery_math.cpp -o test_flashlight_battery_math
 ./test_flashlight_battery_math
+```
+
+Compile and run the isolated objective progress rules test with GCC and UndefinedBehaviorSanitizer:
+
+```bash
+g++ -std=c++17 -Wall -Wextra -Werror -pedantic -fsanitize=undefined -fno-sanitize-recover=undefined -I Source/TheLastSignal/Public Tests/test_objective_progress_math.cpp -o test_objective_progress_math
+./test_objective_progress_math
 ```
 
 Compile and run the isolated survival health rules test with GCC and UndefinedBehaviorSanitizer:

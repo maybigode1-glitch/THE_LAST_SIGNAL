@@ -8,7 +8,7 @@
 - [x] Battery-pack inventory addition uses a shared overflow-safe int64 intermediate and retains the 0..99 cap.
 - [x] Battery pickups are consumed only when the inventory count increases; a full inventory leaves the pickup available.
 - [x] Standalone native C++ regression cases for ordinary additions, cap behavior, accepted/rejected pickup additions, non-positive amounts, and int32 boundary values.
-- [x] GameMode objective counter and configurable target (default 3).
+- [x] GameMode objective counter and configurable target (default 3), normalized through a shared pure C++ progress contract so visible counts stay within `0..target` and registration saturates safely.
 - [x] Native C++ survival HUD source for flashlight, inventory, health, objectives, and reticle.
 - [x] Player health rejects non-finite/non-positive damage and already-dead state before the engine damage handler; overkill is clamped to remaining health and `TakeDamage` reports only the health actually removed.
 - [x] Flashlight battery values are normalized to 0..100; invalid drain/time inputs cannot corrupt charge, invalid or ineffective recharge attempts do not consume an inventory pack, and recharge remains correct when the output reference aliases the input value.
@@ -36,7 +36,7 @@
 - [x] Offline tests for the map builder INI helper: update existing keys while preserving unrelated settings, create a missing section, and repeat updates idempotently.
 
 ## Automated validation
-- [x] GitHub Actions workflow runs repository metadata validation, the complete Python unit-test suite, the standalone battery inventory C++ regression executable (16 cases), the standalone Stalker melee rules C++ regression executable (15 cases), the survival health C++ regression executable (13 cases), and the flashlight battery C++ regression executable (25 cases). See the [GitHub Actions workflow history](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/actions/workflows/validation.yml) for the latest repository validation result.
+- [x] GitHub Actions workflow runs repository metadata validation, the complete Python unit-test suite, the standalone battery inventory C++ regression executable (16 cases), the standalone Stalker melee rules C++ regression executable (15 cases), the survival health C++ regression executable (16 cases), the flashlight battery C++ regression executable (25 cases), and the objective progress C++ regression executable (22 cases). See the [GitHub Actions workflow history](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/actions/workflows/validation.yml) for the latest repository validation result.
 
 ## Validation still pending
 - [ ] Run `Scripts/qa_relay_station.py` inside Unreal Editor after generating the map; inspect `Saved/RelayStation01_QA.json`.
@@ -49,4 +49,4 @@
 - [ ] Assign skeletal mesh, Animation Blueprint, attack montage, and audio assets; test in runtime.
 - [ ] Produce Windows packaged build and perform gameplay QA.
 
-The offline Editor-QA unit tests use a small Unreal Python API double to test the script's report/pass/fail behavior; they do not execute Unreal Editor. The map-builder preflight tests use the same limited approach to check failure ordering and cleanup error handling, not actual level operations. The standalone battery inventory, Stalker melee rules, survival health, and flashlight battery tests compile and execute pure C++ headers used by the game source, but do not compile the Unreal module. The INI-helper tests use standard-library temporary files and do not execute Unreal Editor. Repository checks do not prove Unreal compilation, editor startup, map generation, runtime behavior, or packaging.
+The offline Editor-QA unit tests use a small Unreal Python API double to test the script's report/pass/fail behavior; they do not execute Unreal Editor. The map-builder preflight tests use the same limited approach to check failure ordering and cleanup error handling, not actual level operations. The standalone battery inventory, Stalker melee rules, survival health, flashlight battery, and objective progress tests compile and execute pure C++ headers used by the game source, but do not compile the Unreal module. The INI-helper tests use standard-library temporary files and do not execute Unreal Editor. Repository checks do not prove Unreal compilation, editor startup, map generation, runtime behavior, or packaging.

@@ -56,3 +56,11 @@ jobs:
             Tests/test_flashlight_battery_math.cpp \
             -o /tmp/test_flashlight_battery_math
           /tmp/test_flashlight_battery_math
+      - name: Compile and run objective progress C++ regression tests with UBSan
+        run: |
+          g++ -std=c++17 -Wall -Wextra -Werror -pedantic \
+            -fsanitize=undefined -fno-sanitize-recover=undefined \
+            -I Source/TheLastSignal/Public \
+            Tests/test_objective_progress_math.cpp \
+            -o /tmp/test_objective_progress_math
+          /tmp/test_objective_progress_math
