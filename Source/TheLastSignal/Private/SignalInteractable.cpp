@@ -1,6 +1,7 @@
 #include "SignalInteractable.h"
 #include "LastSignalGameMode.h"
 #include "LastSignalCharacter.h"
+#include "SignalInteractionRules.h"
 #include "Components/StaticMeshComponent.h"
 #include "Engine/Engine.h"
 #include "Engine/World.h"
@@ -14,11 +15,16 @@ ASignalInteractable::ASignalInteractable()
 }
 void ASignalInteractable::Interact_Implementation(AActor* InteractingActor)
 {
-    if (bHasBeenActivated || !Cast<ALastSignalCharacter>(InteractingActor)) return;
-
+    const ALastSignalCharacter* Character = Cast<ALastSignalCharacter>(InteractingActor);
     UWorld* World = GetWorld();
     ALastSignalGameMode* Mode = World ? World->GetAuthGameMode<ALastSignalGameMode>() : nullptr;
-    if (!Mode || Mode->AreObjectivesComplete()) return;
+    if (!Mode) return;
+
+    const bool bHasValidPlayer = Character != nullptr;
+    const bool bPlayerAlive = Character && !Character->IsDead();
+    if (!LastSignal::CanActivateSignalTerminal(
+        bHasBeenActivated, bHasValidPlayer, bPlayerAlive, Mode->AreObjectivesComplete()
+    )) return;
 
     Mode->RegisterSignalCollected();
     bHasBeenActivated = true;
