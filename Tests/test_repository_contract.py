@@ -78,7 +78,10 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertIn("RegisterSignalCollected", interactable)
         self.assertIn("AreObjectivesComplete", game_mode)
         self.assertIn("Cast<ALastSignalCharacter>(InteractingActor)", interactable)
-        self.assertIn("if (!Mode || Mode->AreObjectivesComplete()) return;", interactable)
+        self.assertIn('#include "SignalInteractionRules.h"', interactable)
+        self.assertIn("LastSignal::CanActivateSignalTerminal(", interactable)
+        self.assertIn("Character && !Character->IsDead()", interactable)
+        self.assertIn("Mode->AreObjectivesComplete()", interactable)
     def test_survival_hud_displays_battery_inventory_and_objectives(self):
         hud = (ROOT / "Source/TheLastSignal/Private/LastSignalHUD.cpp").read_text(encoding="utf-8")
         mode = (ROOT / "Source/TheLastSignal/Private/LastSignalGameMode.cpp").read_text(encoding="utf-8")
