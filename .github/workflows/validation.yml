@@ -64,3 +64,11 @@ jobs:
             Tests/test_objective_progress_math.cpp \
             -o /tmp/test_objective_progress_math
           /tmp/test_objective_progress_math
+      - name: Compile and run signal terminal interaction C++ regression tests with UBSan
+        run: |
+          g++ -std=c++17 -Wall -Wextra -Werror -pedantic \
+            -fsanitize=undefined -fno-sanitize-recover=undefined \
+            -I Source/TheLastSignal/Public \
+            Tests/test_signal_interaction_rules.cpp \
+            -o /tmp/test_signal_interaction_rules
+          /tmp/test_signal_interaction_rules
