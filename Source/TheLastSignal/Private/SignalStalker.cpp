@@ -125,6 +125,18 @@ void ASignalStalker::UpdateBehaviour()
     ALastSignalCharacter* Player = Cast<ALastSignalCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
     if (!AI || !Player || Player->IsDead())
     {
+        if (AI) AI->StopMovement();
+        if (UCharacterMovementComponent* Movement = GetCharacterMovement())
+        {
+            Movement->StopMovementImmediately();
+        }
+
+        GetWorldTimerManager().ClearTimer(AttackImpactTimer);
+        GetWorldTimerManager().ClearTimer(AttackStateTimer);
+        bIsAttacking = false;
+        bHasLastKnownPlayerLocation = false;
+        bSearchingLastKnownLocation = false;
+        SetSearchingState(false);
         SetChasingState(false);
         return;
     }
