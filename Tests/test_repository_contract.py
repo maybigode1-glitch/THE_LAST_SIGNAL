@@ -101,10 +101,12 @@ class RepositoryContractTests(unittest.TestCase):
         behaviour = source.split("void ASignalStalker::UpdateBehaviour()", 1)[1].split(
             "\nvoid ASignalStalker::PerformAttack()", 1
         )[0]
-        no_target = behaviour.split("if (!AI || !Player || Player->IsDead())", 1)[1].split(
+        no_target = behaviour.split("if (!LastSignal::CanUpdateStalkerBehaviour(AI != nullptr, bHasLivingPlayer))", 1)[1].split(
             "\n    const float Distance", 1
         )[0]
         for token in (
+            "const bool bHasLivingPlayer = Player && !Player->IsDead();",
+            "LastSignal::CanUpdateStalkerBehaviour(AI != nullptr, bHasLivingPlayer)",
             "if (AI) AI->StopMovement();",
             "Movement->StopMovementImmediately();",
             "ClearTimer(AttackImpactTimer)",
@@ -118,6 +120,23 @@ class RepositoryContractTests(unittest.TestCase):
             self.assertIn(token, no_target)
         self.assertLess(no_target.index("ClearTimer(AttackImpactTimer)"), no_target.index("return;"))
         self.assertLess(no_target.index("ClearTimer(AttackStateTimer)"), no_target.index("return;"))
+
+
+    def test_stalker_tick_reaches_shutdown_path_when_controller_is_missing(self):
+        source = (ROOT / "Source/TheLastSignal/Private/SignalStalker.cpp").read_text(encoding="utf-8")
+        tick = source.split("void ASignalStalker::Tick(float DeltaSeconds)", 1)[1].split(
+            "\nvoid ASignalStalker::SetChasingState", 1
+        )[0]
+        self.assertIn("UpdateBehaviour();", tick)
+        self.assertIn("NextDecisionTime", tick)
+        self.assertNotIn("if (!GetController()) return;", tick)
+
+    def test_stalker_target_rules_fail_closed_for_lost_possession_and_dead_player(self):
+        helper = (ROOT / "Source/TheLastSignal/Public/StalkerTargetRules.h").read_text(encoding="utf-8")
+        source = (ROOT / "Source/TheLastSignal/Private/SignalStalker.cpp").read_text(encoding="utf-8")
+        self.assertIn("return hasAIController && hasLivingPlayer;", helper)
+        self.assertIn('#include "StalkerTargetRules.h"', source)
+        self.assertIn("CanUpdateStalkerBehaviour(AI != nullptr, bHasLivingPlayer)", source)
 
     def test_stalker_attack_defers_damage_and_revalidates_at_impact(self):
         source = (ROOT / "Source/TheLastSignal/Private/SignalStalker.cpp").read_text(encoding="utf-8")

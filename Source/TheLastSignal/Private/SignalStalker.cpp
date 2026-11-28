@@ -1,5 +1,6 @@
 #include "SignalStalker.h"
 #include "StalkerMeleeRules.h"
+#include "StalkerTargetRules.h"
 #include "SignalStalkerAnimInstance.h"
 #include "LastSignalCharacter.h"
 #include "AIController.h"
@@ -76,7 +77,8 @@ void ASignalStalker::Tick(float DeltaSeconds)
         LastFootstepLocation = CurrentLocation;
     }
 
-    if (!GetController()) return;
+    // Always reach the fail-closed behaviour path after AI possession is lost.
+    // Returning here would leave chase state and pending attack timers untouched.
     if (GetWorld()->GetTimeSeconds() >= NextDecisionTime)
     {
         UpdateBehaviour();
@@ -123,7 +125,8 @@ void ASignalStalker::UpdateBehaviour()
 {
     AAIController* AI = Cast<AAIController>(GetController());
     ALastSignalCharacter* Player = Cast<ALastSignalCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
-    if (!AI || !Player || Player->IsDead())
+    const bool bHasLivingPlayer = Player && !Player->IsDead();
+    if (!LastSignal::CanUpdateStalkerBehaviour(AI != nullptr, bHasLivingPlayer))
     {
         if (AI) AI->StopMovement();
         if (UCharacterMovementComponent* Movement = GetCharacterMovement())

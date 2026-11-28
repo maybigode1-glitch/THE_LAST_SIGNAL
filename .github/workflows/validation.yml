@@ -72,3 +72,11 @@ jobs:
             Tests/test_signal_interaction_rules.cpp \
             -o /tmp/test_signal_interaction_rules
           /tmp/test_signal_interaction_rules
+      - name: Compile and run Stalker target availability C++ regression tests with UBSan
+        run: |
+          g++ -std=c++17 -Wall -Wextra -Werror -pedantic \
+            -fsanitize=undefined -fno-sanitize-recover=undefined \
+            -I Source/TheLastSignal/Public \
+            Tests/test_stalker_target_rules.cpp \
+            -o /tmp/test_stalker_target_rules
+          /tmp/test_stalker_target_rules
