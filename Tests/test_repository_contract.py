@@ -105,8 +105,8 @@ class RepositoryContractTests(unittest.TestCase):
             "\n    const float Distance", 1
         )[0]
         self.assertIn("const bool bHasLivingPlayer = Player && !Player->IsDead();", behaviour)
+        self.assertIn("LastSignal::CanUpdateStalkerBehaviour(AI != nullptr, bHasLivingPlayer)", behaviour)
         for token in (
-            "LastSignal::CanUpdateStalkerBehaviour(AI != nullptr, bHasLivingPlayer)",
             "if (AI) AI->StopMovement();",
             "Movement->StopMovementImmediately();",
             "ClearTimer(AttackImpactTimer)",
