@@ -16,6 +16,7 @@
 - [x] Standalone C++ regression cases cover flashlight battery normalization, drain, depletion, invalid/non-finite inputs, overflow-resistant large drains, accepted/rejected recharge, and aliased input/output behavior (25 cases).
 - [x] Standalone C++ regression cases verify actual damage reporting for ordinary, fractional, lethal, overkill, and partially depleted health, plus non-positive, NaN, infinite, and invalid current-health inputs (16 cases).
 - [x] Stalker AI source for patrol, sight detection, pursuit, search, and melee attacks.
+- [x] Stalker stops movement, cancels pending melee timers, and clears chase/search state when the player is missing or dead; source-contract regression added, runtime verification still pending.
 - [x] Melee attack wind-up: impact requires the attack state to remain active and rechecks range and line of sight with a valid AI controller before damage can be applied.
 - [x] Standalone C++ regression cases for Stalker melee range boundaries, controller possession, line of sight, invalid geometry, and expired attack-state cancellation (15 cases).
 - [x] Visible cube placeholder for the stalker when no skeletal mesh is assigned.
