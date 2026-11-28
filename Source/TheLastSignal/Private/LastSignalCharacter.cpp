@@ -53,11 +53,13 @@ void ALastSignalCharacter::Tick(float DeltaSeconds)
 }
 float ALastSignalCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-    if (!LastSignal::IsValidDamageAmount(DamageAmount)) return 0.0f;
+    if (bIsDead || !LastSignal::IsValidDamageAmount(DamageAmount)) return 0.0f;
 
-    const float AppliedDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+    const float DamageAfterEngineRules = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
     float UpdatedHealth = Health;
-    if (bIsDead || !LastSignal::TryApplyDamageToHealth(Health, AppliedDamage, UpdatedHealth)) return 0.0f;
+    float ActualDamage = 0.0f;
+    if (!LastSignal::TryApplyDamageToHealth(
+        Health, DamageAfterEngineRules, UpdatedHealth, ActualDamage)) return 0.0f;
 
     Health = UpdatedHealth;
     if (Health <= 0.0f)
@@ -77,7 +79,7 @@ float ALastSignalCharacter::TakeDamage(float DamageAmount, FDamageEvent const& D
     {
         GEngine->AddOnScreenDebugMessage(-1, 1.2f, FColor::Red, FString::Printf(TEXT("INJURED  |  HEALTH %.0f%%"), Health));
     }
-    return AppliedDamage;
+    return ActualDamage;
 }
 void ALastSignalCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {

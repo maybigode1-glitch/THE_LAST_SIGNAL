@@ -78,7 +78,10 @@ class RepositoryContractTests(unittest.TestCase):
         self.assertIn("RegisterSignalCollected", interactable)
         self.assertIn("AreObjectivesComplete", game_mode)
         self.assertIn("Cast<ALastSignalCharacter>(InteractingActor)", interactable)
-        self.assertIn("if (!Mode || Mode->AreObjectivesComplete()) return;", interactable)
+        self.assertIn('#include "SignalInteractionRules.h"', interactable)
+        self.assertIn("LastSignal::CanActivateSignalTerminal(", interactable)
+        self.assertIn("Character && !Character->IsDead()", interactable)
+        self.assertIn("Mode->AreObjectivesComplete()", interactable)
     def test_survival_hud_displays_battery_inventory_and_objectives(self):
         hud = (ROOT / "Source/TheLastSignal/Private/LastSignalHUD.cpp").read_text(encoding="utf-8")
         mode = (ROOT / "Source/TheLastSignal/Private/LastSignalGameMode.cpp").read_text(encoding="utf-8")
@@ -93,6 +96,48 @@ class RepositoryContractTests(unittest.TestCase):
         for token in ("LineOfSightTo", "MoveToActor", "MoveToLocation", "PerformAttack", "GetRandomReachablePointInRadius"):
             self.assertIn(token, source)
         self.assertIn("AIModule", (ROOT / "Source/TheLastSignal/TheLastSignal.Build.cs").read_text(encoding="utf-8"))
+    def test_stalker_stops_and_cancels_attacks_when_player_is_missing_or_dead(self):
+        source = (ROOT / "Source/TheLastSignal/Private/SignalStalker.cpp").read_text(encoding="utf-8")
+        behaviour = source.split("void ASignalStalker::UpdateBehaviour()", 1)[1].split(
+            "\nvoid ASignalStalker::PerformAttack()", 1
+        )[0]
+        no_target = behaviour.split("if (!LastSignal::CanUpdateStalkerBehaviour(AI != nullptr, bHasLivingPlayer))", 1)[1].split(
+            "\n    const float Distance", 1
+        )[0]
+        self.assertIn("const bool bHasLivingPlayer = Player && !Player->IsDead();", behaviour)
+        self.assertIn("LastSignal::CanUpdateStalkerBehaviour(AI != nullptr, bHasLivingPlayer)", behaviour)
+        for token in (
+            "if (AI) AI->StopMovement();",
+            "Movement->StopMovementImmediately();",
+            "ClearTimer(AttackImpactTimer)",
+            "ClearTimer(AttackStateTimer)",
+            "bIsAttacking = false;",
+            "bHasLastKnownPlayerLocation = false;",
+            "bSearchingLastKnownLocation = false;",
+            "SetSearchingState(false);",
+            "SetChasingState(false);",
+        ):
+            self.assertIn(token, no_target)
+        self.assertLess(no_target.index("ClearTimer(AttackImpactTimer)"), no_target.index("return;"))
+        self.assertLess(no_target.index("ClearTimer(AttackStateTimer)"), no_target.index("return;"))
+
+
+    def test_stalker_tick_reaches_shutdown_path_when_controller_is_missing(self):
+        source = (ROOT / "Source/TheLastSignal/Private/SignalStalker.cpp").read_text(encoding="utf-8")
+        tick = source.split("void ASignalStalker::Tick(float DeltaSeconds)", 1)[1].split(
+            "\nvoid ASignalStalker::SetChasingState", 1
+        )[0]
+        self.assertIn("UpdateBehaviour();", tick)
+        self.assertIn("NextDecisionTime", tick)
+        self.assertNotIn("if (!GetController()) return;", tick)
+
+    def test_stalker_target_rules_fail_closed_for_lost_possession_and_dead_player(self):
+        helper = (ROOT / "Source/TheLastSignal/Public/StalkerTargetRules.h").read_text(encoding="utf-8")
+        source = (ROOT / "Source/TheLastSignal/Private/SignalStalker.cpp").read_text(encoding="utf-8")
+        self.assertIn("return hasAIController && hasLivingPlayer;", helper)
+        self.assertIn('#include "StalkerTargetRules.h"', source)
+        self.assertIn("CanUpdateStalkerBehaviour(AI != nullptr, bHasLivingPlayer)", source)
+
     def test_stalker_attack_defers_damage_and_revalidates_at_impact(self):
         source = (ROOT / "Source/TheLastSignal/Private/SignalStalker.cpp").read_text(encoding="utf-8")
         attack = source.split("void ASignalStalker::PerformAttack()", 1)[1].split(
@@ -128,16 +173,20 @@ class RepositoryContractTests(unittest.TestCase):
             "\nvoid ALastSignalCharacter::SetupPlayerInputComponent", 1
         )[0]
         self.assertLess(
-            damage.index("IsValidDamageAmount(DamageAmount)"),
+            damage.index("bIsDead || !LastSignal::IsValidDamageAmount(DamageAmount)"),
             damage.index("Super::TakeDamage")
         )
+        self.assertIn("TryApplyDamageToHealth(", damage)
         self.assertIn(
-            "TryApplyDamageToHealth(Health, AppliedDamage, UpdatedHealth)", damage
+            "Health, DamageAfterEngineRules, UpdatedHealth, ActualDamage",
+            damage
         )
         self.assertLess(
             damage.index("TryApplyDamageToHealth"),
             damage.index("Health = UpdatedHealth")
         )
+        self.assertIn("return ActualDamage;", damage)
+        self.assertNotIn("return DamageAfterEngineRules;", damage)
     def test_stalker_animation_state_and_montage_hooks(self):
         header = (ROOT / "Source/TheLastSignal/Public/SignalStalkerAnimInstance.h").read_text(encoding="utf-8")
         source = (ROOT / "Source/TheLastSignal/Private/SignalStalkerAnimInstance.cpp").read_text(encoding="utf-8")

@@ -8,13 +8,16 @@
 - [x] Battery-pack inventory addition uses a shared overflow-safe int64 intermediate and retains the 0..99 cap.
 - [x] Battery pickups are consumed only when the inventory count increases; a full inventory leaves the pickup available.
 - [x] Standalone native C++ regression cases for ordinary additions, cap behavior, accepted/rejected pickup additions, non-positive amounts, and int32 boundary values.
-- [x] GameMode objective counter and configurable target (default 3).
+- [x] GameMode objective counter and configurable target (default 3), normalized through a shared pure C++ progress contract so visible counts stay within `0..target` and registration saturates safely.
+- [x] Relay terminal activation uses a shared pure C++ eligibility contract: reject repeat activation, missing/non-player actors, dead players, and interactions after objective completion.
 - [x] Native C++ survival HUD source for flashlight, inventory, health, objectives, and reticle.
-- [x] Player health rejects non-finite/non-positive damage before the engine damage handler and applies finite damage through a shared pure C++ health helper.
+- [x] Player health rejects non-finite/non-positive damage and already-dead state before the engine damage handler; overkill is clamped to remaining health and `TakeDamage` reports only the health actually removed.
 - [x] Flashlight battery values are normalized to 0..100; invalid drain/time inputs cannot corrupt charge, invalid or ineffective recharge attempts do not consume an inventory pack, and recharge remains correct when the output reference aliases the input value.
 - [x] Standalone C++ regression cases cover flashlight battery normalization, drain, depletion, invalid/non-finite inputs, overflow-resistant large drains, accepted/rejected recharge, and aliased input/output behavior (25 cases).
-- [x] Standalone C++ regression cases for ordinary, fractional, lethal, overkill, non-positive, NaN, infinite, and invalid current-health inputs (13 cases).
+- [x] Standalone C++ regression cases verify actual damage reporting for ordinary, fractional, lethal, overkill, and partially depleted health, plus non-positive, NaN, infinite, and invalid current-health inputs (16 cases).
 - [x] Stalker AI source for patrol, sight detection, pursuit, search, and melee attacks.
+- [x] Stalker stops movement, cancels pending melee timers, and clears chase/search state when the player is missing/dead or AI possession is lost; source-contract regression added, runtime verification still pending.
+- [x] Stalker target-availability decision is a pure C++ contract with four standalone regression cases, including lost possession and no living player.
 - [x] Melee attack wind-up: impact requires the attack state to remain active and rechecks range and line of sight with a valid AI controller before damage can be applied.
 - [x] Standalone C++ regression cases for Stalker melee range boundaries, controller possession, line of sight, invalid geometry, and expired attack-state cancellation (15 cases).
 - [x] Visible cube placeholder for the stalker when no skeletal mesh is assigned.
@@ -36,7 +39,7 @@
 - [x] Offline tests for the map builder INI helper: update existing keys while preserving unrelated settings, create a missing section, and repeat updates idempotently.
 
 ## Automated validation
-- [x] GitHub Actions workflow runs repository metadata validation, the complete Python unit-test suite, the standalone battery inventory C++ regression executable (16 cases), the standalone Stalker melee rules C++ regression executable (15 cases), the survival health C++ regression executable (13 cases), and the flashlight battery C++ regression executable (25 cases). Latest successful run: [GitHub Actions #199](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/actions/runs/45610996570).
+- [x] GitHub Actions workflow runs repository metadata validation, the complete Python unit-test suite, the standalone battery inventory C++ regression executable (16 cases), the standalone Stalker melee rules C++ regression executable (15 cases), the survival health C++ regression executable (16 cases), the flashlight battery C++ regression executable (25 cases), the objective progress C++ regression executable (22 cases), the signal terminal interaction C++ regression executable (12 cases), and the Stalker target-availability C++ regression executable (4 cases). See the [GitHub Actions workflow history](https://github.com/maybigode1-glitch/THE_LAST_SIGNAL/actions/workflows/validation.yml) for the latest repository validation result.
 
 ## Validation still pending
 - [ ] Run `Scripts/qa_relay_station.py` inside Unreal Editor after generating the map; inspect `Saved/RelayStation01_QA.json`.
@@ -49,4 +52,4 @@
 - [ ] Assign skeletal mesh, Animation Blueprint, attack montage, and audio assets; test in runtime.
 - [ ] Produce Windows packaged build and perform gameplay QA.
 
-The offline Editor-QA unit tests use a small Unreal Python API double to test the script's report/pass/fail behavior; they do not execute Unreal Editor. The map-builder preflight tests use the same limited approach to check failure ordering and cleanup error handling, not actual level operations. The standalone battery inventory, Stalker melee rules, survival health, and flashlight battery tests compile and execute pure C++ headers used by the game source, but do not compile the Unreal module. The INI-helper tests use standard-library temporary files and do not execute Unreal Editor. Repository checks do not prove Unreal compilation, editor startup, map generation, runtime behavior, or packaging.
+The offline Editor-QA unit tests use a small Unreal Python API double to test the script's report/pass/fail behavior; they do not execute Unreal Editor. The map-builder preflight tests use the same limited approach to check failure ordering and cleanup error handling, not actual level operations. The standalone battery inventory, Stalker melee rules, survival health, flashlight battery, objective progress, signal terminal interaction, and Stalker target-availability tests compile and execute pure C++ headers used by the game source, but do not compile the Unreal module. The INI-helper tests use standard-library temporary files and do not execute Unreal Editor. Repository checks do not prove Unreal compilation, editor startup, map generation, runtime behavior, or packaging.

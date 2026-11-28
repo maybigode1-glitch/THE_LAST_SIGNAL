@@ -71,6 +71,7 @@ Footsteps are distance-based rather than tied to animation notifies in this firs
 - [ ] Idle and movement blend correctly using `GroundSpeed`.
 - [ ] Chase and search states react to their Boolean variables.
 - [ ] Attack montage plays when the enemy attacks.
+- [ ] Stalker stops movement, clears chase/search state, and cancels pending attack timers when AI possession is lost or the player dies/disappears.
 - [ ] Footsteps play only while moving.
 - [ ] Alert and search cues play on state entry, not every AI decision tick.
 - [ ] Attack cue plays once per attack.

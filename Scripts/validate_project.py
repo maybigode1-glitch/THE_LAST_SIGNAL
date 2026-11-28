@@ -12,7 +12,13 @@ REQUIRED_FILES = (
     "Source/TheLastSignal/Public/LastSignalCharacter.h", "Source/TheLastSignal/Private/LastSignalCharacter.cpp",
     "Source/TheLastSignal/Public/BatteryInventoryMath.h", "Source/TheLastSignal/Public/SurvivalHealthMath.h",
     "Source/TheLastSignal/Public/FlashlightBatteryMath.h",
+    "Source/TheLastSignal/Public/ObjectiveProgressMath.h",
+    "Source/TheLastSignal/Public/SignalInteractionRules.h",
+    "Source/TheLastSignal/Public/StalkerTargetRules.h",
     "Tests/test_flashlight_battery_math.cpp",
+    "Tests/test_objective_progress_math.cpp",
+    "Tests/test_signal_interaction_rules.cpp",
+    "Tests/test_stalker_target_rules.cpp",
     "Source/TheLastSignal/Public/SignalInteractable.h", "Source/TheLastSignal/Private/SignalInteractable.cpp",
     "Source/TheLastSignal/Public/SignalBatteryPickup.h", "Source/TheLastSignal/Private/SignalBatteryPickup.cpp",
     "Source/TheLastSignal/Public/LastSignalGameMode.h", "Source/TheLastSignal/Private/LastSignalGameMode.cpp",
@@ -56,12 +62,13 @@ def validate_repository(root: Path) -> list[str]:
             if mapping not in config:
                 errors.append(f"Missing input mapping: {mapping}")
     checks = {
-        "Source/TheLastSignal/Private/LastSignalCharacter.cpp": ("USpotLightComponent", "ToggleFlashlight", "FlashlightDrainPerSecond", "AddBatteryPack", "UseBatteryPack", '#include "SurvivalHealthMath.h"', "IsValidDamageAmount(DamageAmount)", "TryApplyDamageToHealth(Health, AppliedDamage, UpdatedHealth)", '#include "FlashlightBatteryMath.h"', "ClampFlashlightBattery(FlashlightBattery)", "DrainFlashlightBattery(FlashlightBattery, FlashlightDrainPerSecond, DeltaSeconds)", "TryRechargeFlashlightBattery("),
+        "Source/TheLastSignal/Private/LastSignalCharacter.cpp": ("USpotLightComponent", "ToggleFlashlight", "FlashlightDrainPerSecond", "AddBatteryPack", "UseBatteryPack", '#include "SurvivalHealthMath.h"', "IsValidDamageAmount(DamageAmount)", "TryApplyDamageToHealth(", "DamageAfterEngineRules, UpdatedHealth, ActualDamage", "return ActualDamage;", '#include "FlashlightBatteryMath.h"', "ClampFlashlightBattery(FlashlightBattery)", "DrainFlashlightBattery(FlashlightBattery, FlashlightDrainPerSecond, DeltaSeconds)", "TryRechargeFlashlightBattery("),
         "Source/TheLastSignal/Private/SignalBatteryPickup.cpp": ("ASignalBatteryPickup", "AddBatteryPack", "Destroy()"),
-        "Source/TheLastSignal/Private/LastSignalGameMode.cpp": ("RegisterSignalCollected", "AreObjectivesComplete", "ALastSignalHUD::StaticClass"),
+        "Source/TheLastSignal/Private/LastSignalGameMode.cpp": ("RegisterSignalCollected", "AreObjectivesComplete", "LastSignal::TryRegisterSignalCollected", "GetRequiredSignals()", "ALastSignalHUD::StaticClass"),
+        "Source/TheLastSignal/Public/LastSignalGameMode.h": ('#include "ObjectiveProgressMath.h"', "LastSignal::ClampSignalsCollected", "LastSignal::NormalizeRequiredSignals", "LastSignal::AreSignalObjectivesComplete"),
         "Source/TheLastSignal/Private/LastSignalHUD.cpp": ("GetFlashlightBatteryPercent", "GetBatteryPackCount", "GetSignalsCollected", "GetRequiredSignals", "DrawHUD", "FLASHLIGHT", "SPARE BATTERIES", "GetHealthPercent"),
-        "Source/TheLastSignal/Private/SignalInteractable.cpp": ("RegisterSignalCollected", "bHasBeenActivated", "Cast<ALastSignalCharacter>(InteractingActor)", "AreObjectivesComplete"),
-        "Source/TheLastSignal/Private/SignalStalker.cpp": ("AAIController", "LineOfSightTo", "MoveToActor", "MoveToLocation", "PerformAttack", "TakeDamage", "GetRandomReachablePointInRadius", "FootstepSound", "AlertSound", "AttackSound", "SearchSound", "AmbientLoopSound", "ChaseLoopSound", "Montage_Play", "bIsAttacking", "ApplyAttackDamage", "AttackImpactTimer", '#include "StalkerMeleeRules.h"', "CanApplyStalkerMeleeDamage", "bHasAIController", "bHasLineOfSight", "GreyboxVisual", "BasicShapes/Cube.Cube"),
+        "Source/TheLastSignal/Private/SignalInteractable.cpp": ('#include "SignalInteractionRules.h"', "RegisterSignalCollected", "bHasBeenActivated", "Cast<ALastSignalCharacter>(InteractingActor)", "CanActivateSignalTerminal", "Character && !Character->IsDead()", "AreObjectivesComplete"),
+        "Source/TheLastSignal/Private/SignalStalker.cpp": ("AAIController", "LineOfSightTo", "MoveToActor", "MoveToLocation", "PerformAttack", "TakeDamage", "GetRandomReachablePointInRadius", "FootstepSound", "AlertSound", "AttackSound", "SearchSound", "AmbientLoopSound", "ChaseLoopSound", "Montage_Play", "bIsAttacking", "ApplyAttackDamage", "AttackImpactTimer", '#include "StalkerMeleeRules.h"', '#include "StalkerTargetRules.h"', "CanUpdateStalkerBehaviour", "bHasLivingPlayer", "CanApplyStalkerMeleeDamage", "bHasAIController", "bHasLineOfSight", "GreyboxVisual", "BasicShapes/Cube.Cube"),
         "Source/TheLastSignal/Private/SignalStalkerAnimInstance.cpp": ("NativeUpdateAnimation", "GroundSpeed", "IsChasing", "IsSearching", "IsAttacking"),
         "Source/TheLastSignal/Private/SignalPrototypeArea.cpp": ("BuildGeometry", "SpawnObjectivesAndPickups", "SpawnStalker", "ASignalBatteryPickup", "ASignalInteractable", "ASignalStalker", "BasicShapes/Cube.Cube"),
     }
