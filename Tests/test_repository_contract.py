@@ -104,8 +104,8 @@ class RepositoryContractTests(unittest.TestCase):
         no_target = behaviour.split("if (!LastSignal::CanUpdateStalkerBehaviour(AI != nullptr, bHasLivingPlayer))", 1)[1].split(
             "\n    const float Distance", 1
         )[0]
+        self.assertIn("const bool bHasLivingPlayer = Player && !Player->IsDead();", behaviour)
         for token in (
-            "const bool bHasLivingPlayer = Player && !Player->IsDead();",
             "LastSignal::CanUpdateStalkerBehaviour(AI != nullptr, bHasLivingPlayer)",
             "if (AI) AI->StopMovement();",
             "Movement->StopMovementImmediately();",
