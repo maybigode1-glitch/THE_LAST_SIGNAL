@@ -96,6 +96,29 @@ class RepositoryContractTests(unittest.TestCase):
         for token in ("LineOfSightTo", "MoveToActor", "MoveToLocation", "PerformAttack", "GetRandomReachablePointInRadius"):
             self.assertIn(token, source)
         self.assertIn("AIModule", (ROOT / "Source/TheLastSignal/TheLastSignal.Build.cs").read_text(encoding="utf-8"))
+    def test_stalker_stops_and_cancels_attacks_when_player_is_missing_or_dead(self):
+        source = (ROOT / "Source/TheLastSignal/Private/SignalStalker.cpp").read_text(encoding="utf-8")
+        behaviour = source.split("void ASignalStalker::UpdateBehaviour()", 1)[1].split(
+            "\nvoid ASignalStalker::PerformAttack()", 1
+        )[0]
+        no_target = behaviour.split("if (!AI || !Player || Player->IsDead())", 1)[1].split(
+            "\n    const float Distance", 1
+        )[0]
+        for token in (
+            "if (AI) AI->StopMovement();",
+            "Movement->StopMovementImmediately();",
+            "ClearTimer(AttackImpactTimer)",
+            "ClearTimer(AttackStateTimer)",
+            "bIsAttacking = false;",
+            "bHasLastKnownPlayerLocation = false;",
+            "bSearchingLastKnownLocation = false;",
+            "SetSearchingState(false);",
+            "SetChasingState(false);",
+        ):
+            self.assertIn(token, no_target)
+        self.assertLess(no_target.index("ClearTimer(AttackImpactTimer)"), no_target.index("return;"))
+        self.assertLess(no_target.index("ClearTimer(AttackStateTimer)"), no_target.index("return;"))
+
     def test_stalker_attack_defers_damage_and_revalidates_at_impact(self):
         source = (ROOT / "Source/TheLastSignal/Private/SignalStalker.cpp").read_text(encoding="utf-8")
         attack = source.split("void ASignalStalker::PerformAttack()", 1)[1].split(
